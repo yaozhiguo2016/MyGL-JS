@@ -45,9 +45,9 @@ export default class Geometry extends Object3D
 
     protected gl:WebGLRenderingContext;
 
-    public constructor(pos?:Vector3)
+    public constructor()
     {
-        super(pos);
+        super();
 
         this.gl = RenderContext.context;
         let a_Position:number = this.gl.getAttribLocation(this.gl['program'], 'a_Position');

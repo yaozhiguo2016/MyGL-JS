@@ -18,9 +18,9 @@ export default class Cube extends Geometry
     //  |/      |/
     //  v2------v3
 
-    constructor(width:number = 40, height:number = 40, depth:number = 40, pos?:Vector3)
+    constructor(width:number = 40, height:number = 40, depth:number = 40)
     {
-        super(pos);
+        super();
         this._width = width || 40;
         this._height = height || 40;
         this._depth = depth || 40;

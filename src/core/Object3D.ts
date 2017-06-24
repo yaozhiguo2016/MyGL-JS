@@ -13,36 +13,16 @@ export default class Object3D extends EventDispatcher
     public static ADDED:string = 'added';
     public static REMOVED:string = 'removed';
 
-    /*private _transformMatrix:Matrix4;
-
-    public get transformMatrix():Matrix4
-    {
-        return this._transformMatrix;
-    }
-
-    private _pos:Vector3;
-
-    public set pos(value:Vector3)
-    {
-        this._pos = value;
-        this._transformMatrix.makeTranslation(value.x, value.y, value.z);
-    }
-
-    public get pos():Vector3
-    {
-        return this._pos;
-    }*/
-
-    private _matrix:Matrix4;
-    private _worldMatrix:Matrix4;
+    protected _localMatrix:Matrix4;
+    protected _worldMatrix:Matrix4;
     private _modelViewMatrix:Matrix4;
     private _normalMatrix:Matrix4;
     /**
      * 局部坐标矩阵
      */
-    public get matrix():Matrix4
+    public get localMatrix():Matrix4
     {
-        return this._matrix;
+        return this._localMatrix;
     }
 
     /**
@@ -71,6 +51,7 @@ export default class Object3D extends EventDispatcher
 
     private _parent:Object3D;
     private _children:Array<Object3D>;
+    private _visible:boolean = true;
 
     public get children():Array<Object3D>
     {
@@ -80,6 +61,16 @@ export default class Object3D extends EventDispatcher
     public get parent():Object3D
     {
         return this._parent;
+    }
+
+    public get visible():boolean
+    {
+        return this._visible;
+    }
+
+    public set visible(value:boolean)
+    {
+        this._visible = value;
     }
 
     private _name:string = 'object3d';
@@ -146,14 +137,19 @@ export default class Object3D extends EventDispatcher
 
     public constructor()
     {
-        //this._pos = pos || new Vector3();
-        //this._transformMatrix = new Matrix4();
-
+        super();
         this._children = [];
-        this._matrix = new Matrix4();
+        this._localMatrix = new Matrix4();
         this._worldMatrix = new Matrix4();
         this._modelViewMatrix = new Matrix4();
         this._normalMatrix = new Matrix4();
+
+        this._rotation.onChange(()=>{
+            this._quaternion.setFromEuler( this._rotation, false );
+        }, this);
+        this._quaternion.onChange(()=>{
+            this._rotation.setFromQuaternion( this._quaternion, undefined, false );
+        }, this);
     }
 
     /**
@@ -163,18 +159,18 @@ export default class Object3D extends EventDispatcher
     public doMatrix(matrix:Matrix4):void
     {
         //注意顺序，是先作自我信息中的转换
-        this._matrix.multiplyMatrices(matrix, this._matrix);
+        this._localMatrix.multiplyMatrices(matrix, this._localMatrix);
         //把转换后的组合矩阵分解到各个转换分量中
-        this._matrix.decompose(this._position, this._quaternion, this._scale);
+        this._localMatrix.decompose(this._position, this._quaternion, this._scale);
     }
 
     public addChild(child:Object3D):void
     {
         if (child != this)
         {
-            if ( child.parent !== null )
+            if (child.parent)
             {
-                child.parent.removeChild( child );
+                child.parent.removeChild(child);
             }
             child._parent = this;
             child.dispatch(new BaseEvent(Object3D.ADDED));
@@ -241,21 +237,109 @@ export default class Object3D extends EventDispatcher
 
     public getWorldPosition():Vector3
     {
-        return null;
+        let result = new Vector3();
+        this.updateWorldMatrix();
+        return result.setFromMatrixPosition(this._worldMatrix);
     }
 
     public getWorldRotation():EulerAngle
     {
-        return null;
+        let result = new EulerAngle();
+        let quaternion = this.getWorldQuaternion();
+        return result.setFromQuaternion(quaternion, this.rotation.order, false);
     }
 
     public getWorldScale():Vector3
     {
-        return null;
+        let position = new Vector3();
+        let quaternion = new Quaternion();
+        let result = new Vector3();
+        this.updateWorldMatrix();
+        this._worldMatrix.decompose(position, quaternion, result);
+        return result;
     }
 
     public getWorldQuaternion():Quaternion
     {
-        return null;
+        let position = new Vector3();
+        let scale = new Vector3();
+        let result = new Quaternion();
+        this.updateWorldMatrix();
+
+        this._worldMatrix.decompose( position, result, scale );
+        return result;
+    }
+
+    protected updateMatrix():void
+    {
+        this._localMatrix.compose(this._position, this._quaternion, this._scale);
+    }
+
+    public updateWorldMatrix():void
+    {
+        this.updateMatrix();
+
+        if (!this.parent)
+        {
+            this._worldMatrix.copy(this.localMatrix);
+        }
+        else
+        {
+            this._worldMatrix.multiplyMatrices(this.parent._worldMatrix, this.localMatrix);
+        }
+
+        // update children
+        let children = this.children;
+        for (let i = 0, l = children.length; i < l; i++)
+        {
+            children[i].updateWorldMatrix();
+        }
+    }
+
+    /**
+     * 递归遍历所有的对象，包括自身
+     * @param callback {Function | (Object3d)=>{}}
+     */
+    public traverse(callback:Function):void
+    {
+        callback(this);
+        let children = this.children;
+
+        for (let i = 0, l = children.length; i < l; i++)
+        {
+            children[i].traverse(callback);
+        }
+    }
+
+    /**
+     * 递归遍历所有可见对象。包括自身
+     * @param callback{Function | (Object3d)=>{}}
+     */
+    public traverseVisible(callback:Function):void
+    {
+        if (!this.visible) return;
+        callback(this);
+
+        let children = this.children;
+
+        for (let i = 0, l = children.length; i < l; i++)
+        {
+            children[i].traverseVisible(callback);
+        }
+    }
+
+    /**
+     * 递归遍历当前对象的所有父容器对象，即容器链，比如A包含B，B又包含C，则遍历C的父容器结果应该是B->A.
+     * @param callback{Function | (Object3d)=>{}}
+     */
+    public traverseAncestors(callback:Function):void
+    {
+        let parent = this.parent;
+
+        if (parent !== null)
+        {
+            callback(parent);
+            parent.traverseAncestors(callback);
+        }
     }
 }

@@ -2,7 +2,6 @@ import Light from "../lights/Light";
 import Camera from "../cameras/Camera";
 import Geometry from "../primitives/Geometry";
 import RenderContext from "../RenderContext";
-import PerspectiveCamera from "../cameras/PerspectiveCamera";
 import Vector3 from "../math/Vector3";
 import Matrix4 from "../math/Matrix4";
 /**
@@ -90,7 +89,9 @@ export default class Scene3D
 
     public addGeometry(geometry:Geometry):void
     {
-        this._objectes.push(geometry);
+        geometry.traverse((child:Geometry)=>{
+            this._objectes.push(child);
+        });
     }
 
     public setAmbientColor(color:Vector3):void
@@ -140,16 +141,17 @@ export default class Scene3D
                 console.log('Failed to get the storage location of mvpMatrix');
             }
 
-            this.mvpMatrix.identity();
-            this.mvpMatrix.copy((<PerspectiveCamera>(this.currentCamera)).perpectiveMatrix);
-            this.mvpMatrix.multiply(this.currentCamera.viewMatrix);
-            this.mvpMatrix.multiply(geo.transformMatrix);
-            gl.uniformMatrix4fv(this.uMVP, false, this.mvpMatrix.elements);
+            //model-view-projection
+            geo.updateWorldMatrix();
+            this.currentCamera.updateWorldMatrix();
+            geo.modelViewMatrix.multiplyMatrices(this.currentCamera.inverseMatrix, geo.worldMatrix);
+            geo.modelViewMatrix.premultiply(this.currentCamera.projMatrix);
+            gl.uniformMatrix4fv(this.uMVP, false, geo.modelViewMatrix.elements);
 
-            let normalM:Matrix4 = new Matrix4();
-            normalM.getInverse(geo.transformMatrix, true);
-            normalM.transpose();
-            gl.uniformMatrix4fv(this.uNormal, false, normalM.elements);
+            //法线转换
+            geo.normalMatrix.getInverse(geo.worldMatrix, true);
+            geo.normalMatrix.transpose();
+            gl.uniformMatrix4fv(this.uNormal, false, geo.normalMatrix.elements);
 
             //光照处理
             let u_LightColor:WebGLUniformLocation = gl.getUniformLocation(gl['program'], 'u_LightColor');

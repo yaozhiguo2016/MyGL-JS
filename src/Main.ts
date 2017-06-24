@@ -5,12 +5,9 @@
 
 import Engine from "./Engine";
 import Scene3D from "./core/Scene3D";
-import Camera from "./cameras/Camera";
 import PerspectiveCamera from "./cameras/PerspectiveCamera";
 import Cube from "./primitives/Cube";
 import Vector3 from "./math/Vector3";
-import Matrix4 from "./math/Matrix4";
-import Quaternion from "./math/Quaternion";
 
 export default class Main
 {
@@ -26,13 +23,6 @@ export default class Main
      */
     public start():void
     {
-        // new DrawImage();
-        //new GLClock();
-        //new LookAtRotateTriangle();
-        // new SimpleCube();
-        //new ColorCube();
-
-
         this.engine = new Engine(true);
         this.engine.setRenderLoop(this.loop, this);
 
@@ -40,15 +30,18 @@ export default class Main
         this.scene.initialize();
 
         this.camera = new PerspectiveCamera();
-        this.camera.pos = new Vector3(0.0, 5.0, 15.0);
+        this.camera.position = new Vector3(0.0, 0, 15.0);
         this.scene.addCamera(this.camera);
+        // this.camera.rotation.x = 0.2;
+        this.camera.lookAt(new Vector3(0.0, 0.0, 0.0), Vector3.UP);
 
         this.cube = new Cube();
-        this.cube.transformMatrix.makeTranslation(0.0, 0.0, -5.0);
+        this.cube.position = new Vector3(0, 0.0, -5.0);
         this.scene.addGeometry(this.cube);
 
         this.cube2 = new Cube();
-        this.cube2.transformMatrix.makeTranslation(-1.5, 0.0, -20.0);
+        this.cube2.position = new Vector3(0, 0.0, -10.0);
+        //this.cube.addChild(this.cube2);
         this.scene.addGeometry(this.cube2);
 
         this.engine.setScene(this.scene);
@@ -57,21 +50,19 @@ export default class Main
     }
 
     private rotation:number = 30;
+    private dis:number = 0.15;
 
     private loop():void
     {
-        // this.cube.matrix.setIdentity();
-        //this.cube.pos = new Vector3([1.5, 0.0, 0.0]);
-        //this.cube2.transformMatrix.mu(1, 0.0, 0.0, 1.0);
-        this.cube2.transformMatrix.makeRotationAxis(Vector3.FORWARD, this.rotation+=0.01);
-        let q:Quaternion = new Quaternion();
-        q.setFromAxisAngle(Vector3.UP, 0.02);
+        //this.cube.position.z -= 0.05;
+        this.cube.rotation.x = this.rotation+=0.01;
+        this.cube.rotation.y = this.rotation+=0.01;
 
-        let ro:Matrix4 = new Matrix4();
-        //ro.makeRotationAxis(Vector3.UP, 0.02);
-        ro.makeRotationFromQuaternion(q);
-        this.cube.transformMatrix.premultiply(ro);
-        this.camera.lookAt(new Vector3(0.0, 0.0, 0.0), Vector3.UP);
+        this.cube2.translate(this.dis, Vector3.UP);
+        this.cube2.rotation.x = this.rotation+=0.01;
+
+        //this.camera.position.z += 0.02;
+
         this.scene.draw();
     }
 }

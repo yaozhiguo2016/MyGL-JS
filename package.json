@@ -1,12 +1,13 @@
 {
-  "name": "webgl-ts",
+  "name": "mygl-js",
   "version": "1.0.0",
-  "description": "learning webgl with typescript2.x",
+  "description": "develop webgl with typescript2.x",
   "main": "main",
   "scripts": {
     "test": "glrun"
   },
   "keywords": [
+    "3D",
     "webgl",
     "ts"
   ],

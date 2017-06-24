@@ -12,6 +12,9 @@ export default class Quaternion
     private _z:number;
     private _w:number;
 
+    private _changeCallback:Function;
+    private _changeCallbackContext:any;
+
     public constructor(x:number = 0, y:number = 0, z:number = 0, w:number = 1)
     {
         this._x = x;
@@ -35,6 +38,27 @@ export default class Quaternion
     public get w():number
     {
         return this._w;
+    }
+
+    public set x(value:number)
+    {
+        this._x = value;
+        this.onChangeCallback();
+    }
+    public set y(value:number)
+    {
+        this._y = value;
+        this.onChangeCallback();
+    }
+    public set z(value:number)
+    {
+        this._z = value;
+        this.onChangeCallback();
+    }
+    public set w(value:number)
+    {
+        this._w = value;
+        this.onChangeCallback();
     }
 
     public static slerp ( qa:Quaternion, qb:Quaternion, qm:Quaternion, t:number ):Quaternion
@@ -132,7 +156,7 @@ export default class Quaternion
 
     public setFromEuler ( euler:EulerAngle, update:boolean = false ):Quaternion
     {
-        let x = euler._x, y = euler._y, z = euler._z, order = euler.order;
+        let x = euler.x, y = euler.y, z = euler.z, order = euler.order;
 
         // http://www.mathworks.com/matlabcentral/fileexchange/
         // 	20696-function-to-convert-between-dcm-euler-angles-quaternions-and-euler-vectors/
@@ -386,8 +410,8 @@ export default class Quaternion
     {
         // from http://www.euclideanspace.com/maths/algebra/realNormedAlgebra/quaternions/code/index.htm
 
-        var qax = a._x, qay = a._y, qaz = a._z, qaw = a._w;
-        var qbx = b._x, qby = b._y, qbz = b._z, qbw = b._w;
+        let qax = a._x, qay = a._y, qaz = a._z, qaw = a._w;
+        let qbx = b._x, qby = b._y, qbz = b._z, qbw = b._w;
 
         this._x = qax * qbw + qaw * qbx + qay * qbz - qaz * qby;
         this._y = qay * qbw + qaw * qby + qaz * qbx - qax * qbz;
@@ -404,11 +428,11 @@ export default class Quaternion
         if ( t === 0 ) return this;
         if ( t === 1 ) return this.copy( qb );
 
-        var x = this._x, y = this._y, z = this._z, w = this._w;
+        let x = this._x, y = this._y, z = this._z, w = this._w;
 
         // http://www.euclideanspace.com/maths/algebra/realNormedAlgebra/quaternions/slerp/
 
-        var cosHalfTheta = w * qb._w + x * qb._x + y * qb._y + z * qb._z;
+        let cosHalfTheta = w * qb._w + x * qb._x + y * qb._y + z * qb._z;
 
         if ( cosHalfTheta < 0 ) {
 
@@ -436,7 +460,7 @@ export default class Quaternion
 
         }
 
-        var sinHalfTheta = Math.sqrt( 1.0 - cosHalfTheta * cosHalfTheta );
+        let sinHalfTheta = Math.sqrt( 1.0 - cosHalfTheta * cosHalfTheta );
 
         if ( Math.abs( sinHalfTheta ) < 0.001 ) {
 
@@ -449,8 +473,8 @@ export default class Quaternion
 
         }
 
-        var halfTheta = Math.atan2( sinHalfTheta, cosHalfTheta );
-        var ratioA = Math.sin( ( 1 - t ) * halfTheta ) / sinHalfTheta,
+        let halfTheta = Math.atan2( sinHalfTheta, cosHalfTheta );
+        let ratioA = Math.sin( ( 1 - t ) * halfTheta ) / sinHalfTheta,
             ratioB = Math.sin( t * halfTheta ) / sinHalfTheta;
 
         this._w = ( w * ratioA + this._w * ratioB );
@@ -495,14 +519,18 @@ export default class Quaternion
         return array;
     }
 
-    public onChange ( callback ):Quaternion
+    public onChange ( callback:Function, context:any ):Quaternion
     {
-        this.onChangeCallback = callback;
+        this._changeCallback = callback;
+        this._changeCallbackContext = context;
         return this;
     }
 
-    public onChangeCallback ()
+    private onChangeCallback():void
     {
-
+        if (this._changeCallback)
+        {
+            this._changeCallback.call(this._changeCallbackContext);
+        }
     }
 }

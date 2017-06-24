@@ -6,22 +6,32 @@ import Vector3 from "../math/Vector3";
  */
 export default class Camera extends Object3D
 {
-    protected _viewMatrix:Matrix4;
+    protected _projMatrix:Matrix4;
+    protected _inverseMatrix:Matrix4;
 
-    public get viewMatrix():Matrix4
+    public get projMatrix():Matrix4
     {
-        return this._viewMatrix;
+        return this._projMatrix;
     }
 
-    public constructor(pos?:Vector3)
+    public constructor()
     {
-        super(pos);
-        this._viewMatrix = new Matrix4();
+        super();
+        this._projMatrix = new Matrix4();
+        this._inverseMatrix = new Matrix4();
     }
 
     public lookAt(targetPos:Vector3, upVec3:Vector3):void
     {
-        this._viewMatrix.identity();
-        this._viewMatrix.makeLookAt(this.pos, targetPos, upVec3);
+        this._worldMatrix.makeLookAt(this.position, targetPos, upVec3);
+    }
+
+    /**
+     * 这个世界坐标系的逆矩阵反映了摄影机的世界变换的逆操作，让场景的顶点执行此操作可以转换视图到世界标架
+     */
+    public get inverseMatrix():Matrix4
+    {
+        //this.updateWorldMatrix();
+        return this._inverseMatrix.getInverse(this.worldMatrix, false);
     }
 }

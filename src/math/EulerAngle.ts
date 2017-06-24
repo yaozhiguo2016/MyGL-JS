@@ -11,11 +11,14 @@ export default class EulerAngle
     public static ROTATION_ORDERS:string[] = ['XYZ', 'YZX', 'ZXY', 'XZY', 'YXZ', 'ZYX'];
     public static DEFAULT_ORDER:string = 'XYZ';
 
-    public _x:number;
-    public _y:number;
-    public _z:number;
+    private _x:number;
+    private _y:number;
+    private _z:number;
 
     public _order:string;
+
+    private _changeCallback:Function;
+    private _changeCallbackContext:any;
 
     public constructor(x:number = 0, y:number = 0, z:number = 0, order:string = 'XYZ')
     {
@@ -28,6 +31,7 @@ export default class EulerAngle
     public set x(value:number)
     {
         this._x = value;
+        this.onChangeCallback();
     }
 
     public get x():number
@@ -38,6 +42,7 @@ export default class EulerAngle
     public set y(value:number)
     {
         this._y = value;
+        this.onChangeCallback();
     }
 
     public get y():number
@@ -48,6 +53,7 @@ export default class EulerAngle
     public set z(value:number)
     {
         this._z = value;
+        this.onChangeCallback();
     }
 
     public get z():number
@@ -58,6 +64,7 @@ export default class EulerAngle
     public set order(value:string)
     {
         this._order = value;
+        this.onChangeCallback();
     }
 
     public get order():string
@@ -71,7 +78,7 @@ export default class EulerAngle
         this._y = y;
         this._z = z;
         this._order = order || this._order;
-        //this.onChangeCallback();
+        this.onChangeCallback();
         return this;
     }
 
@@ -86,11 +93,11 @@ export default class EulerAngle
         this._y = euler._y;
         this._z = euler._z;
         this._order = euler._order;
-        //this.onChangeCallback();
+        this.onChangeCallback();
         return this;
     }
 
-    public setFromRotationMatrix( m:Matrix3|Matrix4, order:string, update:boolean ):EulerAngle
+    public setFromRotationMatrix( m:Matrix3|Matrix4, order:string, update:boolean=false ):EulerAngle
     {
         let clamp = MathEx.clamp;
 
@@ -207,7 +214,7 @@ export default class EulerAngle
 
         this._order = order;
 
-        //if ( update !== false ) this.onChangeCallback();
+        if ( update !== false ) this.onChangeCallback();
 
         return this;
     }
@@ -246,7 +253,7 @@ export default class EulerAngle
         this._z = array[ 2 ];
         if ( array[ 3 ] !== undefined ) this._order = array[ 3 ];
 
-        //this.onChangeCallback();
+        this.onChangeCallback();
 
         return this;
     }
@@ -273,6 +280,21 @@ export default class EulerAngle
         else
         {
             return new Vector3( this._x, this._y, this._z );
+        }
+    }
+
+    public onChange ( callback:Function, context:any ):EulerAngle
+    {
+        this._changeCallback = callback;
+        this._changeCallbackContext = context;
+        return this;
+    }
+
+    private onChangeCallback():void
+    {
+        if (this._changeCallback)
+        {
+            this._changeCallback.call(this._changeCallbackContext);
         }
     }
 }
