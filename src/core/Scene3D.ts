@@ -1,9 +1,8 @@
 import Light from "../lights/Light";
 import Camera from "../cameras/Camera";
-import Geometry from "../primitives/Geometry";
 import RenderContext from "../RenderContext";
 import Vector3 from "../math/Vector3";
-import Matrix4 from "../math/Matrix4";
+import Mesh from "./Mesh";
 /**
  * Created by yaozh on 2017/6/6.
  */
@@ -46,7 +45,7 @@ export default class Scene3D
 
     private _lights:Light[];
     private _cameras:Camera[];
-    private _objectes:Geometry[];
+    private _meshes:Mesh[];
     private _ambientColor:Vector3;
     private _directionLightColor:Vector3;
     private _directionLightDirection:Vector3;
@@ -64,11 +63,11 @@ export default class Scene3D
     {
         this._lights = [];
         this._cameras = [];
-        this._objectes = [];
+        this._meshes = [];
 
         this._ambientColor = new Vector3(0.2, 0.2, 0.2);
         this._directionLightColor = new Vector3(1.0, 1.0, 1.0);
-        this._directionLightDirection = new Vector3(0.0, 0.0, -1.0);
+        this._directionLightDirection = new Vector3(0.0, 0.0, 1.0);
     }
 
     public addLight(light:Light):void
@@ -87,10 +86,10 @@ export default class Scene3D
         }
     }
 
-    public addGeometry(geometry:Geometry):void
+    public addMesh(mesh:Mesh):void
     {
-        geometry.traverse((child:Geometry)=>{
-            this._objectes.push(child);
+        mesh.traverse((child:Mesh)=>{
+            this._meshes.push(child);
         });
     }
 
@@ -108,8 +107,6 @@ export default class Scene3D
     private uMVP:WebGLUniformLocation;
     private uNormal:WebGLUniformLocation;
 
-    private mvpMatrix:Matrix4;
-
     public initialize():void
     {
         this.gl = RenderContext.context;
@@ -118,7 +115,6 @@ export default class Scene3D
             console.log('shader init failed.');
             return;
         }
-        this.mvpMatrix = new Matrix4();
     }
 
     public draw():void
@@ -132,7 +128,7 @@ export default class Scene3D
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
         // Draw the cube
 
-        for (let geo of this._objectes)
+        for (let mesh of this._meshes)
         {
             this.uMVP = gl.getUniformLocation(gl['program'], 'mvpMatrix');
             this.uNormal = gl.getUniformLocation(gl['program'], 'u_NormalMatrix');
@@ -141,17 +137,18 @@ export default class Scene3D
                 console.log('Failed to get the storage location of mvpMatrix');
             }
 
+            //mesh.geometry.bindData();
             //model-view-projection
-            geo.updateWorldMatrix();
+            mesh.updateWorldMatrix();
             this.currentCamera.updateWorldMatrix();
-            geo.modelViewMatrix.multiplyMatrices(this.currentCamera.inverseMatrix, geo.worldMatrix);
-            geo.modelViewMatrix.premultiply(this.currentCamera.projMatrix);
-            gl.uniformMatrix4fv(this.uMVP, false, geo.modelViewMatrix.elements);
+            mesh.modelViewMatrix.multiplyMatrices(this.currentCamera.inverseMatrix, mesh.worldMatrix);
+            mesh.modelViewMatrix.premultiply(this.currentCamera.projMatrix);
+            gl.uniformMatrix4fv(this.uMVP, false, mesh.modelViewMatrix.elements);
 
             //法线转换
-            geo.normalMatrix.getInverse(geo.worldMatrix, true);
-            geo.normalMatrix.transpose();
-            gl.uniformMatrix4fv(this.uNormal, false, geo.normalMatrix.elements);
+            mesh.normalMatrix.getInverse(mesh.worldMatrix, true);
+            mesh.normalMatrix.transpose();
+            gl.uniformMatrix4fv(this.uNormal, false, mesh.normalMatrix.elements);
 
             //光照处理
             let u_LightColor:WebGLUniformLocation = gl.getUniformLocation(gl['program'], 'u_LightColor');
@@ -163,14 +160,17 @@ export default class Scene3D
             }
 
             // Set the light color (white)
-            gl.uniform3f(u_LightColor, 1.0, 1.0, 1.0);
-            gl.uniform3f(u_AmbientColor, 0.2, 0.2, 0.2);
+            gl.uniform3f(u_AmbientColor, this._ambientColor.x, this._ambientColor.y, this._ambientColor.z);
+            gl.uniform3f(u_LightColor, this._directionLightColor.x, this._directionLightColor.y, this._directionLightColor.z);
             // Set the light direction (in the world coordinate)
-            let lightDirection:Vector3 = new Vector3(0.5, 3.0, 4.0);
+            let lightDirection:Vector3 = new Vector3();
+            lightDirection.copyFrom(this._directionLightDirection);
             lightDirection.normalize();     // Normalize
             gl.uniform3fv(u_LightDirection, lightDirection.elements);
 
-            gl.drawElements(gl.TRIANGLES, geo.indices.length, gl.UNSIGNED_BYTE, 0);
+            mesh.geometry.setBuffersAndAttribs();
+
+            gl.drawElements(gl.TRIANGLES, mesh.geometry.indices.length, gl.UNSIGNED_SHORT, 0);
         }
     }
 }

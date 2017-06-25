@@ -713,6 +713,13 @@ export default class Matrix4
         return this;
     }
 
+    /**
+     * 把当前矩阵设置为某个错切变换
+     * @param x
+     * @param y
+     * @param z
+     * @returns {Matrix4}
+     */
     public makeShear ( x:number, y:number, z:number ):Matrix4
     {
         this.set(
@@ -726,6 +733,13 @@ export default class Matrix4
         return this;
     }
 
+    /**
+     * 把位置向量，方位四元数，缩放系数组合到当前矩阵
+     * @param position {Vector3}
+     * @param quaternion {Quaternion}
+     * @param scale {Vector3}
+     * @returns {Matrix4}
+     */
     public compose ( position:Vector3, quaternion:Quaternion, scale:Vector3 ):Matrix4
     {
         this.makeRotationFromQuaternion( quaternion );
@@ -789,6 +803,16 @@ export default class Matrix4
         return this;
     }
 
+    /**
+     * 把当前矩阵设置成圆台形透视投影矩阵
+     * @param left
+     * @param right
+     * @param top
+     * @param bottom
+     * @param near
+     * @param far
+     * @returns {Matrix4}
+     */
     public makeFrustum ( left:number, right:number, top:number, bottom:number, near:number, far:number ):Matrix4
     {
         let te:Float32Array = this.elements;
@@ -808,6 +832,14 @@ export default class Matrix4
         return this;
     }
 
+    /**
+     * 把当前矩阵设置成圆台形透视投影矩阵,和makeFrustum的不同在于参数设置不同
+     * @param fovy
+     * @param aspect
+     * @param near
+     * @param far
+     * @returns {Matrix4}
+     */
     public makePerspective (fovy:number, aspect:number, near:number, far:number):Matrix4
     {
         let e:Float32Array;
@@ -859,6 +891,16 @@ export default class Matrix4
         return this;
     }
 
+    /**
+     * 把当前矩阵设置成圆台形平行投影矩阵
+     * @param left
+     * @param right
+     * @param top
+     * @param bottom
+     * @param near
+     * @param far
+     * @returns {Matrix4}
+     */
     public makeOrthographic ( left:number, right:number, top:number, bottom:number, near:number, far:number ):Matrix4
     {
         let te = this.elements;

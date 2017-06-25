@@ -4,16 +4,18 @@ import Camera from "./Camera";
  */
 export default class PerspectiveCamera extends Camera
 {
-    private _fov:number = 60;
-    private _near:number = 0.1;
-    private _far:number = 10000;
+    private _fov:number;
+    private _near:number;
+    private _far:number;
+    private _aspeact:number;
 
-    public constructor(fov?:number, near?:number, far?:number)
+    public constructor(fov?:number, aspeact?:number, near?:number, far?:number)
     {
         super();
         this._fov = fov || 45;
         this._near = near || 0.1;
         this._far = far || 10000;
-        this._projMatrix.makePerspective(this._fov, 1.0, this._near, this._far);
+        this._aspeact = aspeact || 1.0;
+        this._projMatrix.makePerspective(this._fov, this._aspeact, this._near, this._far);
     }
 }

@@ -1,5 +1,4 @@
 import Geometry from "./Geometry";
-import Vector3 from "../math/Vector3";
 /**
  * Created by yaozh on 2017/6/6.
  */
@@ -52,7 +51,7 @@ export default class Cube extends Geometry
             0.0, 0.0,-1.0,   0.0, 0.0,-1.0,   0.0, 0.0,-1.0,   0.0, 0.0,-1.0   // v4-v7-v6-v5 back
         ]);
 
-        this._indices = new Uint8Array([       // Indices of the vertices
+        this._indices = new Uint16Array([       // Indices of the vertices
             0, 1, 2,   0, 2, 3,    // front
             4, 5, 6,   4, 6, 7,    // right
             8, 9,10,   8,10,11,    // up
@@ -61,20 +60,6 @@ export default class Cube extends Geometry
             20,21,22,  20,22,23     // back
         ]);
 
-        let gl:WebGLRenderingContext = this.gl;
-
-        // Write date into the buffer object
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, this._vertexPositions, gl.STATIC_DRAW);
-
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.normalBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, this._vertexNormals, gl.STATIC_DRAW);
-
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.colorBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, this._vertexColors, gl.STATIC_DRAW);
-
-        // Write the indices to the buffer object
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
-        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, this._indices, gl.STATIC_DRAW);
+        this.createBufferData();
     }
 }
