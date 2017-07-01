@@ -5,3 +5,4 @@ npm install
 # run
 gulp
 
+![快照](https://github.com/yaozhiguo2016/MyGL-JS/blob/master/screeshot.png)
