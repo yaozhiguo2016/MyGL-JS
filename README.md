@@ -4,5 +4,6 @@
 npm install
 # run
 gulp
+下图演示了场景中模型变换，平行光和点光源：
 
 ![快照](https://github.com/yaozhiguo2016/MyGL-JS/blob/master/screeshot.png)
