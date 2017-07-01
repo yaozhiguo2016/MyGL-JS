@@ -19,17 +19,20 @@ export default class Camera extends Object3D
         super();
         this._projMatrix = new Matrix4();
         this._inverseMatrix = new Matrix4();
+        this._type = 'Camera';
     }
 
     public lookAt(targetPos:Vector3, upVec3:Vector3):void
     {
-        this._worldMatrix.makeLookAt(this.position, targetPos, upVec3);
+        let lookAtMatrix:Matrix4 = new Matrix4();
+        lookAtMatrix.lookAt(this.position, targetPos, upVec3);
+        this._quaternion.setFromRotationMatrix(lookAtMatrix);
     }
 
     /**
      * 这个世界坐标系的逆矩阵反映了摄影机的世界变换的逆操作，让场景的顶点执行此操作可以转换视图到世界标架
      */
-    public get inverseMatrix():Matrix4
+    public get inverseWorldMatrix():Matrix4
     {
         //this.updateWorldMatrix();
         return this._inverseMatrix.getInverse(this.worldMatrix, false);

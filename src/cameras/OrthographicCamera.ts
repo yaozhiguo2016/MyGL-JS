@@ -21,5 +21,7 @@ export default class OrthographicCamera extends Camera
         this._near = near || 0.1;
         this._far = far || 10000;
         this._projMatrix.makeOrthographic(this._left, this._right, this._top, this._bottom, this._near, this._far);
+
+        this._type = 'OrthographicCamera';
     }
 }

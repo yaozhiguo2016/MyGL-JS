@@ -296,7 +296,7 @@ export default class Matrix4
         let upY:number = up.elements[1];
         let upZ:number = up.elements[2];
 
-        var e, fx, fy, fz, rlf, sx, sy, sz, rls, ux, uy, uz;
+        let e, fx, fy, fz, rlf, sx, sy, sz, rls, ux, uy, uz;
 
         fx = centerX - eyeX;
         fy = centerY - eyeY;
@@ -351,7 +351,7 @@ export default class Matrix4
         return this.multiply(translation);
         //return this.translate(-eyeX, -eyeY, -eyeZ);
     }
-    /*
+
     public lookAt (eye:Vector3, target:Vector3, up:Vector3):Matrix4
     {
         let x = new Vector3();
@@ -389,7 +389,7 @@ export default class Matrix4
         te[ 2 ] = x.z; te[ 6 ] = y.z; te[ 10 ] = z.z;
 
         return this;
-    }*/
+    }
 
     public multiply ( m:Matrix4):Matrix4
     {

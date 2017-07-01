@@ -51,6 +51,15 @@ export default class Cube extends Geometry
             0.0, 0.0,-1.0,   0.0, 0.0,-1.0,   0.0, 0.0,-1.0,   0.0, 0.0,-1.0   // v4-v7-v6-v5 back
         ]);
 
+        this._vertexUVs = new Float32Array([    // uv
+            0.0, 0.0,   0.0, 1.0,   0.0, 1.0,   0.0, 1.0,  // v0-v1-v2-v3 front
+            0.0, 0.0,   0.0, 0.0,   0.0, 0.0,   0.0, 0.0,  // v0-v3-v4-v5 right
+            1.0, 0.0,   1.0, 0.0,   1.0, 0.0,   1.0, 0.0,  // v0-v5-v6-v1 up
+            0.0, 0.0,   0.0, 0.0,   0.0, 0.0,   0.0, 0.0,  // v1-v6-v7-v2 left
+            -1.0, 0.0,   -1.0, 0.0,   -1.0, 0.0,   -1.0, 0.0,  // v7-v4-v3-v2 down
+            0.0,-1.0,   0.0,-1.0,   0.0,-1.0,   0.0,-1.0   // v4-v7-v6-v5 back
+        ]);
+
         this._indices = new Uint16Array([       // Indices of the vertices
             0, 1, 2,   0, 2, 3,    // front
             4, 5, 6,   4, 6, 7,    // right
@@ -59,7 +68,5 @@ export default class Cube extends Geometry
             16,17,18,  16,18,19,    // down
             20,21,22,  20,22,23     // back
         ]);
-
-        this.createBufferData();
     }
 }

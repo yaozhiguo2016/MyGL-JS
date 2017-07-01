@@ -13,11 +13,16 @@
     <script src="lib/webgl-debug.js"></script>
     <script src="lib/cuon-utils.js"></script>
     <script src="shaders/ShaderLib.js"></script>
-    <script src="dist/mali-bundle.js"></script>
+    <script src="dist/mygl.js"></script>
 
     <script>
         function a() {
             console.log(0 === 0.0);
+
+            var a = [1,2,3];
+            var b = [4, 5, 6];
+            a.concat(b);
+            console.log(a);
         }
         a();
     </script>

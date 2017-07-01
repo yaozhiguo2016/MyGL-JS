@@ -17,10 +17,10 @@ export default class Plane extends Geometry
         let hh:number = this._height * 0.5;
 
         this._vertexPositions = new Float32Array([
-            -1.0 * hw, 0, -1.0 * hh,  //left-top
+            -1.0 * hw, 0, -1.0 * hh,    //left-top
             -1.0 * hw, 0, 1.0 * hh,     //left-bottom
-            1.0 * hw, 0, 1.0 * hh,  //right-bottom
-            1.0 * hw, 0, -1.0 * hh  //right-top
+            1.0 * hw, 0, 1.0 * hh,      //right-bottom
+            1.0 * hw, 0, -1.0 * hh      //right-top
         ]);
 
         this._vertexNormals = new Float32Array([
@@ -38,16 +38,14 @@ export default class Plane extends Geometry
         ]);
 
         this._vertexUVs = new Float32Array([
-            0.0, 0.0,
             0.0, 1.0,
-            1.0, 1.0,
-            1.0, 0.0
+            0.0, 0.0,
+            1.0, 0.0,
+            1.0, 1.0
         ]);
 
         this._indices = new Uint16Array([
             0, 1, 2, 0, 2, 3
         ]);
-
-        this.createBufferData();
     }
 }

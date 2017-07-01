@@ -10,6 +10,7 @@ export default class Vector3
     public static FORWARD:Vector3 = new Vector3(0, 0, 1);//positive z-axis
     public static UP:Vector3 = new Vector3(0, 1, 0);//positive y-axis
     public static RIGHT:Vector3 = new Vector3(1, 0, 0);//positive x-axis
+    public static ZERO:Vector3 = new Vector3(0, 0, 0);
 
     public x:number;
     public y:number;

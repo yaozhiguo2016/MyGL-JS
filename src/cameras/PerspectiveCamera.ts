@@ -17,5 +17,7 @@ export default class PerspectiveCamera extends Camera
         this._far = far || 10000;
         this._aspeact = aspeact || 1.0;
         this._projMatrix.makePerspective(this._fov, this._aspeact, this._near, this._far);
+
+        this._type = 'PerspectiveCamera';
     }
 }

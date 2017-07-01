@@ -50,7 +50,7 @@ function bundle() {
     return b.bundle()
     // 如果有错误发生，记录这些错误
         .on('error', gutil.log.bind(gutil, 'Browserify Error'))
-        .pipe(source('mali-bundle.js'))
+        .pipe(source('mygl.js'))
         // 可选项，如果你不需要缓存文件内容，就删除
         .pipe(buffer())
         // 可选项，如果你不需要 sourcemaps，就删除
@@ -118,7 +118,7 @@ gulp.task('js-compress', function() {
 });
 
 gulp.task('main-compress', function(){
-    gulp.src('dist/mali-bundle.js').pipe(uglify({
+    gulp.src('dist/mygl.js').pipe(uglify({
         mangle:false
     })).pipe(gulp.dest('dist/min'))
 });

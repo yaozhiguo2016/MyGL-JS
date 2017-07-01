@@ -94,7 +94,5 @@ export default class Sphere extends Geometry
         this._vertexUVs = new Float32Array(uvs);
 
         this._indices = new Uint16Array(indices);
-
-        this.createBufferData();
     }
 }

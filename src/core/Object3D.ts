@@ -73,12 +73,12 @@ export default class Object3D extends EventDispatcher
         this._visible = value;
     }
 
-    private _name:string = 'object3d';
-    private _id:string = MathEx.generateUUID();
-    private _position:Vector3 = new Vector3();
-    private _rotation:EulerAngle = new EulerAngle();
-    private _quaternion:Quaternion = new Quaternion();
-    private _scale:Vector3 = new Vector3(1, 1, 1);
+    protected _name:string = 'object3d';
+    protected _id:string = MathEx.generateUUID();
+    protected _position:Vector3 = new Vector3();
+    protected _rotation:EulerAngle = new EulerAngle();
+    protected _quaternion:Quaternion = new Quaternion();
+    protected _scale:Vector3 = new Vector3(1, 1, 1);
 
     public get name():string
     {
@@ -135,6 +135,13 @@ export default class Object3D extends EventDispatcher
         this._scale = value;
     }
 
+    protected _type:string;
+
+    public get type():string
+    {
+        return this._type;
+    }
+
     public constructor()
     {
         super();
@@ -150,6 +157,8 @@ export default class Object3D extends EventDispatcher
         this._quaternion.onChange(()=>{
             this._rotation.setFromQuaternion( this._quaternion, undefined, false );
         }, this);
+
+        this._type = 'Object3D';
     }
 
     /**
