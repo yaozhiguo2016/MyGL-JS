@@ -31,28 +31,49 @@ export default class StandardMaterialResolver extends MaterialResolver
         let mesh:Mesh = this._mesh;
         let geometry:Geometry = mesh.geometry;
 
-        let glProgram:WebGLProgram = GLProgramLib.getProgram(this._material.type);
-        if (!glProgram)
+        let glProgram:WebGLProgram;
+        if (this._material.texture)
         {
-            glProgram = ShaderUtil.createProgram(gl,
-                AssetsManager.getInstance().getAsset('standard_mat_bp_vshader'),
-                AssetsManager.getInstance().getAsset('standard_mat_bp_fshader'));
-            GLProgramLib.addProgram(this._material.type, glProgram);
+            glProgram = GLProgramLib.getProgram(this._material.type);
+            if (!glProgram)
+            {
+                glProgram = ShaderUtil.createProgram(gl,
+                    AssetsManager.getInstance().getAsset('standard_mat_bp_vshader'),
+                    AssetsManager.getInstance().getAsset('standard_mat_bp_fshader'));
+                GLProgramLib.addProgram(this._material.type, glProgram);
+            }
         }
+        else
+        {
+            glProgram = GLProgramLib.getProgram(this._material.type + '_nt');
+            if (!glProgram)
+            {
+                glProgram = ShaderUtil.createProgram(gl,
+                    AssetsManager.getInstance().getAsset('standard_mat_bp_vshader_nt'),
+                    AssetsManager.getInstance().getAsset('standard_mat_bp_fshader_nt'));
+                GLProgramLib.addProgram(this._material.type + '_nt', glProgram);
+            }
+        }
+
         mesh.usedProgram = glProgram;
-        gl.useProgram(mesh.usedProgram);
+        //gl.useProgram(mesh.usedProgram);
         mesh.a_Position = gl.getAttribLocation(glProgram, 'a_Position');
         mesh.a_Normal = gl.getAttribLocation(glProgram, 'a_Normal');
 
-        mesh.vertexBuffer = mesh.createArrayBuffer(mesh.a_Position, geometry.vertexPosNum, gl.FLOAT, geometry.vertexPositions);
-        mesh.normalBuffer = mesh.createArrayBuffer(mesh.a_Normal, geometry.vertexNormalNum, gl.FLOAT, geometry.vertexNormals);
+        mesh.vertexBuffer = mesh.createArrayBuffer(geometry.vertexPositions);
+        mesh.normalBuffer = mesh.createArrayBuffer(geometry.vertexNormals);
+        if (this._material.texture)
+        {
+            mesh.a_UV = gl.getAttribLocation(glProgram, 'a_TexCood');
+            mesh.uvBuffer = mesh.createArrayBuffer(geometry.uvs);
+        }
         mesh.indexBuffer = mesh.createIndexBuffer();
     }
 
     public resetAttribsAndUniforms():void
     {
         let mesh:Mesh = this._mesh;
-
+        RenderContext.context.useProgram(mesh.usedProgram);
         this.setGLStates(mesh);
         this.handleMVP(mesh);
         this.handleLights(mesh);
@@ -153,8 +174,7 @@ export default class StandardMaterialResolver extends MaterialResolver
 
         UniformUtil.setProgrom(mesh.usedProgram);
 
-        let em:Vector3 = colorMat.emissiveColor;
-        UniformUtil.assign3f('materialEmissive', em.x, em.y, em.z);
+
         let am:Vector3 = colorMat.ambientColor;
         UniformUtil.assign3f('materialAmbient', am.x, am.y, am.z);
         let dc:Vector3 = colorMat.diffuseColor;
@@ -162,6 +182,17 @@ export default class StandardMaterialResolver extends MaterialResolver
         let sc:Vector3 = colorMat.specularColor;
         UniformUtil.assign3f('materialSpecular', sc.x, sc.y, sc.z);
         UniformUtil.assign1f('materialShiness', colorMat.shininess);
+
+        if (colorMat.texture)
+        {
+            UniformUtil.assign1i('u_sampler2d', 0);
+            colorMat.texture.setTextureAttribute();
+        }
+        else
+        {
+            let em:Vector3 = colorMat.emissiveColor;
+            UniformUtil.assign3f('materialEmissive', em.x, em.y, em.z);
+        }
     }
 
     private setBuffersAndAttribs():void
@@ -172,8 +203,14 @@ export default class StandardMaterialResolver extends MaterialResolver
 
         mesh.setBufferAttribute(mesh.vertexBuffer, mesh.a_Position, geometry.vertexPosNum, gl.FLOAT);
         mesh.setBufferAttribute(mesh.normalBuffer, mesh.a_Normal, geometry.vertexNormalNum, gl.FLOAT);
-        //this.setBufferAndAttrib(this.gl, this.colorBuffer, this.a_Color, this.vertexColorNum, this.gl.FLOAT);
-        //this.setBufferAndAttrib(this.gl, this.uvBuffer, this.a_UV, this.vertexUVNum, this.gl.FLOAT);
+        if (this._material.texture)
+        {
+            mesh.setBufferAttribute(mesh.uvBuffer, mesh.a_UV, geometry.vertexUVNum, gl.FLOAT);
+        }
+        else
+        {
+            //console.log(this._material.texture, this._mesh.geometry);
+        }
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, mesh.indexBuffer);
     }
 }

@@ -48,12 +48,9 @@ uniform float materialShiness;
 varying vec3 v_ViewFragCood;
 varying vec3 v_FragNormal;
 
-uniform sampler2D u_sampler2d;
-varying vec2 v_TexCood;
-
 vec3 lighting(vec3 fragCoodInView, vec3 viewDirection, vec3 normal)
 {
-    vec3 color = vec3(texture2D(u_sampler2d, v_TexCood)) + materialAmbient * globalAmbient;//环境光反射
+    vec3 color = materialEmissive + materialAmbient * globalAmbient;//环境光反射
 
     for (int i = 0; i < 2; i++)
     {

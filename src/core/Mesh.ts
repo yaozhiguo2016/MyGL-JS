@@ -5,6 +5,7 @@ import RenderContext from "../RenderContext";
 import Scene3D from "./Scene3D";
 import MaterialResolver from "../materials/materialresolvers/MaterialResolver";
 import ResolverGenerator from "../materials/materialresolvers/ResolverGenerator";
+import Texture from "../textures/Texture";
 /**
  * Created by yaozh on 2017/6/14.
  */
@@ -96,7 +97,7 @@ export default class Mesh extends Object3D
         gl.drawElements(gl.TRIANGLES, this.geometry.indices.length, gl.UNSIGNED_SHORT, 0);
     }
 
-    public createArrayBuffer(a_attribute:number, num:number, type:number, bufferData):WebGLBuffer
+    public createArrayBuffer(bufferData):WebGLBuffer
     {
         let buffer =  this.gl.createBuffer();  // Create a buffer object
         if (!buffer)

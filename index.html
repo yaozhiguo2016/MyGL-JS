@@ -5,8 +5,10 @@
     <title>MyGL-JS</title>
 </head>
 <body>
-    <div>
-        <canvas id="glContainer" style="width: 600px;height: 600px;background-color: black" width="600" height="600"></canvas>
+    <div style="position: relative">
+        <canvas style="position: absolute;top: 0px;" id="glContainer" style="width: 600px;height: 600px;"
+                width="600" height="600"></canvas>
+        <div id="stat" style="position: absolute;color: red;top: 0px;">hi</div>
     </div>
     <!--<script src="lib/cuon-matrix.js"></script>-->
     <script src="lib/webgl-utils.js"></script>

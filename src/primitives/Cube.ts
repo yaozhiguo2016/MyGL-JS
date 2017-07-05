@@ -24,13 +24,17 @@ export default class Cube extends Geometry
         this._height = height || 40;
         this._depth = depth || 40;
 
+        let hw = this._width * 0.5;
+        let hh = this._height * 0.5;
+        let hd = this._depth * 0.5;
+
         this._vertexPositions = new Float32Array([
-            1.0, 1.0, 1.0,  -1.0, 1.0, 1.0,  -1.0,-1.0, 1.0,   1.0,-1.0, 1.0,  // v0-v1-v2-v3 front
-            1.0, 1.0, 1.0,   1.0,-1.0, 1.0,   1.0,-1.0,-1.0,   1.0, 1.0,-1.0,  // v0-v3-v4-v5 right
-            1.0, 1.0, 1.0,   1.0, 1.0,-1.0,  -1.0, 1.0,-1.0,  -1.0, 1.0, 1.0,  // v0-v5-v6-v1 up
-            -1.0, 1.0, 1.0,  -1.0, 1.0,-1.0,  -1.0,-1.0,-1.0,  -1.0,-1.0, 1.0,  // v1-v6-v7-v2 left
-            -1.0,-1.0,-1.0,   1.0,-1.0,-1.0,   1.0,-1.0, 1.0,  -1.0,-1.0, 1.0,  // v7-v4-v3-v2 down
-            1.0,-1.0,-1.0,  -1.0,-1.0,-1.0,  -1.0, 1.0,-1.0,   1.0, 1.0,-1.0   // v4-v7-v6-v5 back
+            hw, hh, hd,  -hw, hh, hd,  -hw,-hh, hd,   hw, -hh, hd,  // v0-v1-v2-v3 front
+            hw, hh, hd,   hw, -hh, hd,   hw, -hh, -hd,   hw, hh, -hd,  // v0-v3-v4-v5 right
+            hw, hh, hd,   hw, hh, -hd,  -hw, hh, -hd,  -hw, hh, hd,  // v0-v5-v6-v1 up
+            -hw, hh, hd,  -hw, hh, -hd,  -hw, -hh, -hd,  -hw, -hh, hd,  // v1-v6-v7-v2 left
+            -hw, -hh, -hd,   hw, -hh, -hd,   hw, -hh, hd,  -hw, -hh, hd,  // v7-v4-v3-v2 down
+            hw, -hh, -hd,  -hw, -hh, -hd,  -hw, hh, -hd,   hw, hh, -hd   // v4-v7-v6-v5 back
         ]);
 
         this._vertexColors = new Float32Array([     // Colors
@@ -52,12 +56,12 @@ export default class Cube extends Geometry
         ]);
 
         this._vertexUVs = new Float32Array([    // uv
-            0.0, 0.0,   0.0, 1.0,   0.0, 1.0,   0.0, 1.0,  // v0-v1-v2-v3 front
-            0.0, 0.0,   0.0, 0.0,   0.0, 0.0,   0.0, 0.0,  // v0-v3-v4-v5 right
-            1.0, 0.0,   1.0, 0.0,   1.0, 0.0,   1.0, 0.0,  // v0-v5-v6-v1 up
-            0.0, 0.0,   0.0, 0.0,   0.0, 0.0,   0.0, 0.0,  // v1-v6-v7-v2 left
-            -1.0, 0.0,   -1.0, 0.0,   -1.0, 0.0,   -1.0, 0.0,  // v7-v4-v3-v2 down
-            0.0,-1.0,   0.0,-1.0,   0.0,-1.0,   0.0,-1.0   // v4-v7-v6-v5 back
+            0.0, 0.0,   0.0, 1.0,   1.0, 0.0,   1.0, 1.0,  // v0-v1-v2-v3 front
+            0.0, 0.0,   0.0, 1.0,   1.0, 0.0,   1.0, 1.0,  // v0-v3-v4-v5 right
+            0.0, 0.0,   0.0, 1.0,   1.0, 0.0,   1.0, 1.0,  // v0-v5-v6-v1 up
+            0.0, 0.0,   0.0, 1.0,   1.0, 0.0,   1.0, 1.0,  // v1-v6-v7-v2 left
+            0.0, 0.0,   0.0, 1.0,   1.0, 0.0,   1.0, 1.0,  // v7-v4-v3-v2 down
+            0.0, 0.0,   0.0, 1.0,   1.0, 0.0,   1.0, 1.0   // v4-v7-v6-v5 back
         ]);
 
         this._indices = new Uint16Array([       // Indices of the vertices

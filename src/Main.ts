@@ -18,6 +18,7 @@ import DirectionLight from "./lights/DirectionLight";
 import PointLight from "./lights/PointLight";
 import Teapot from "./primitives/Teapot";
 import MouseCameraHelper from "./utils/MouseCameraHelper";
+import Texture from "./textures/Texture";
 
 export default class Main
 {
@@ -41,7 +42,11 @@ export default class Main
     {
         AssetsManager.getInstance().addGroup([
             new AssetData('standard_mat_bp_vshader', AssetData.TEXT, './src/shaders/standard_material/phong-f/vert.glsl'),
-            new AssetData('standard_mat_bp_fshader', AssetData.TEXT, './src/shaders/standard_material/phong-f/frag.glsl')
+            new AssetData('standard_mat_bp_fshader', AssetData.TEXT, './src/shaders/standard_material/phong-f/frag.glsl'),
+            new AssetData('standard_mat_bp_vshader_nt', AssetData.TEXT, './src/shaders/standard_material/phong-f/vert_no_texture.glsl'),
+            new AssetData('standard_mat_bp_fshader_nt', AssetData.TEXT, './src/shaders/standard_material/phong-f/frag_no_texture.glsl'),
+            new AssetData('img_earth', AssetData.IMAGE, './resource/earth.bmp'),
+            new AssetData('img_earth01', AssetData.IMAGE, './resource/earth01.jpg')
         ]);
         AssetsManager.getInstance().addEventListener(AssetsManager.GROUP_LOAD_COMPLETE, this.loadComplete, this);
         AssetsManager.getInstance().load();
@@ -53,6 +58,7 @@ export default class Main
         this.engine.setRenderLoop(this.loop, this);
 
         this.scene = new Scene3D();
+        //this.scene.ambientColor = new Vector3(0, 0,0);
         //this.scene.initialize();
 
         this.camera = new PerspectiveCamera();
@@ -63,11 +69,12 @@ export default class Main
 
         let colorMaterial:StandardMaterial = new StandardMaterial();
         colorMaterial.emissiveColor = new Vector3(0.2, 0.2, 0.2);
-        colorMaterial.diffuseColor = new Vector3(0.6, 0.6, 0.6);
+        colorMaterial.diffuseColor = new Vector3(0.2, 0.2, 0.2);
         colorMaterial.specularColor = new Vector3(0.5, 0.5, 0.5);
-        colorMaterial.shininess = 100;
+        colorMaterial.shininess = 50;
+        colorMaterial.texture = new Texture(AssetsManager.getInstance().getAsset('img_earth'), true);
 
-        this.cube = new Mesh(new Cube(), colorMaterial);
+        this.cube = new Mesh(new Cube(2.0, 2, 2), colorMaterial);
         this.cube.position = new Vector3(-5, 0.0, 0.0);
         this.scene.addMesh(this.cube);
 
@@ -96,6 +103,7 @@ export default class Main
 
         let sm2:StandardMaterial = new StandardMaterial();
         sm2.emissiveColor = new Vector3(0.6, 0.6, 0.6);
+        //sm2.texture = new Texture();
         this.pointSphere = new Mesh(new Sphere(0.2, 16, 12), sm2);
         this.pointSphere.position.x = 5;
         this.pointSphere.position.z = 5;
@@ -104,6 +112,7 @@ export default class Main
         let teapot:Teapot = new Teapot();
         let sm:StandardMaterial = new StandardMaterial();
         sm.emissiveColor = new Vector3(0.2, 0.2, 0.0);
+        sm.texture = new Texture();
         this.teapot = new Mesh(teapot, sm);
         this.teapot.position.y = 4;
         this.teapot.scale = new Vector3(0.15, 0.15, 0.15);

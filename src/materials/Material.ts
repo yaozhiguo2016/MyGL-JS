@@ -1,5 +1,5 @@
 import Vector3 from "../math/Vector3";
-import Texture2D from "../textures/Texture2D";
+import Texture from "../textures/Texture";
 /**
  * Created by yaozh on 2017/6/6.
  */
@@ -16,7 +16,7 @@ export default class Material
     protected _diffuseColor:Vector3;
     protected _specularColor:Vector3;
     protected _shininess:number;
-    protected _texture:Texture2D;
+    protected _texture:Texture;
 
     protected _alpha:number;
 
@@ -92,14 +92,14 @@ export default class Material
 
     /**
      * 物体表面纹理
-     * @returns {Texture2D}
+     * @returns {Texture}
      */
-    public get texture():Texture2D
+    public get texture():Texture
     {
         return this._texture;
     }
 
-    public set texture(value:Texture2D)
+    public set texture(value:Texture)
     {
         this._texture = value;
     }

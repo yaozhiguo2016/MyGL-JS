@@ -213,7 +213,9 @@ export default class ImageLoader extends EventDispatcher
     private blobSupport():boolean
     {
         let ua:string = navigator.userAgent.toLowerCase();
-        let value:string = ua.toLowerCase().match(/cpu [^\d]*\d.*like mac os x/)[0];
+        let ma = ua.toLowerCase().match(/cpu [^\d]*\d.*like mac os x/);
+        if (!ma)return false;
+        let value:string = ma[0];
         let iOSVersion:number = parseInt(value.match(/\d+(_\d)*/)[0]) || 0;
         return iOSVersion >= 7;
     }
