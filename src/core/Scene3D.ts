@@ -78,6 +78,7 @@ export default class Scene3D
 
         for (let mesh of this._meshes)
         {
+            if (!mesh.visible)continue;
             mesh.draw();
         }
     }

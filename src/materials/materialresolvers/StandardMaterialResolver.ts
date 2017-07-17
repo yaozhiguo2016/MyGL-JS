@@ -1,6 +1,5 @@
 import MaterialResolver from "./MaterialResolver";
 import Mesh from "../../core/Mesh";
-import Material from "../Material";
 import RenderContext from "../../RenderContext";
 import Geometry from "../../primitives/Geometry";
 import GLProgramLib from "../../shaders/GLProgramLib";
@@ -20,7 +19,7 @@ import Light from "../../lights/Light";
  */
 export default class StandardMaterialResolver extends MaterialResolver
 {
-    public constructor(mesh:Mesh, material:Material)
+    public constructor(mesh:Mesh, material:StandardMaterial)
     {
         super(mesh, material);
     }

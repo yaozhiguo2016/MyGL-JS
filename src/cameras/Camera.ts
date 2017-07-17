@@ -37,4 +37,11 @@ export default class Camera extends Object3D
         //this.updateWorldMatrix();
         return this._inverseMatrix.getInverse(this.worldMatrix, false);
     }
+
+    public get worldDirection():Vector3
+    {
+        let dir:Vector3 = new Vector3(0, 0, -1);
+        let quaternion = this.getWorldQuaternion();
+        return dir.applyQuaternion(quaternion);
+    }
 }

@@ -1,11 +1,10 @@
 import Object3D from "./Object3D";
 import Geometry from "../primitives/Geometry";
-import Material from "../materials/Material";
 import RenderContext from "../RenderContext";
 import Scene3D from "./Scene3D";
 import MaterialResolver from "../materials/materialresolvers/MaterialResolver";
 import ResolverGenerator from "../materials/materialresolvers/ResolverGenerator";
-import Texture from "../textures/Texture";
+import StandardMaterial from "../materials/StandardMaterial";
 /**
  * Created by yaozh on 2017/6/14.
  */
@@ -22,37 +21,43 @@ export default class Mesh extends Object3D
     public a_Color:number;
     public a_UV:number;
 
-    private _geometry:Geometry;
-    private _material:Material;
-    private _usedProgram:WebGLProgram;
-    private _scene:Scene3D;
-    private gl:WebGLRenderingContext;
+    protected _geometry:Geometry;
+    protected _material:StandardMaterial;
+    protected _usedProgram:WebGLProgram;
+    protected _scene:Scene3D;
+    protected gl:WebGLRenderingContext;
 
-    private _resolver:MaterialResolver;
+    protected _resolver:MaterialResolver;
 
     //for public properties
     public static SURFACE_SIDE_FRONT:number = 1;
     public static SURFACE_SIDE_BACK:number = 2;
     public static SURFACE_SIDE_DOUBLE:number = 3;
 
-    private _surfaceSide:number;
-    private _castShadow:boolean;
-    private _receiveShadow:boolean;
+    protected _surfaceSide:number;
+    protected _castShadow:boolean;
+    protected _receiveShadow:boolean;
 
-    public constructor(geometry:Geometry, material:Material)
+    public constructor(geometry:Geometry, material:StandardMaterial)
     {
         super();
         this.gl = RenderContext.context;
         this._geometry = geometry;
         this._material = material;
-        this._resolver = ResolverGenerator.createResolver(material.type, this, material);
-        this._resolver.initMeshData();
 
         this._surfaceSide = Mesh.SURFACE_SIDE_FRONT;
         this._castShadow = false;
         this._receiveShadow = false;
 
+        this.initMaterialResovler();
+
         this._type = 'Mesh';
+    }
+
+    protected initMaterialResovler():void
+    {
+        this._resolver = ResolverGenerator.createResolver(this._material, this);
+        this._resolver.initMeshData();
     }
 
     public get geometry():Geometry
@@ -60,7 +65,7 @@ export default class Mesh extends Object3D
         return this._geometry;
     }
 
-    public get material():Material
+    public get material():StandardMaterial
     {
         return this._material;
     }
