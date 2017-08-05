@@ -9,6 +9,15 @@ export default class Geometry
     protected _indices:Uint16Array;
     protected _vertexUVs:Float32Array;
 
+    protected _indexDraw:boolean = true;
+
+    public get indexDraw():boolean
+    {
+        return this._indexDraw;
+    }
+
+    public vertexCount:number = 0;
+
     public get vertexPositions():Float32Array
     {
         return this._vertexPositions;

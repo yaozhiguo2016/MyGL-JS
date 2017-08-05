@@ -99,7 +99,10 @@ export default class Mesh extends Object3D
     {
         let gl:WebGLRenderingContext = RenderContext.context;
         this._resolver.resetAttribsAndUniforms();
-        gl.drawElements(gl.TRIANGLES, this.geometry.indices.length, gl.UNSIGNED_SHORT, 0);
+        if (this.geometry.indexDraw)
+            gl.drawElements(gl.TRIANGLES, this.geometry.indices.length, gl.UNSIGNED_SHORT, 0);
+        else
+            gl.drawArrays(gl.TRIANGLES, 0, this.geometry.vertexCount);
     }
 
     public createArrayBuffer(bufferData):WebGLBuffer

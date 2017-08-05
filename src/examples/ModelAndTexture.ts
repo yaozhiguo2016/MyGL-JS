@@ -18,6 +18,10 @@ import SkyBox from "../core/SkyBox";
 import CubeMapMaterial from "../materials/CubeMapMaterial";
 import TextureCube from "../textures/TextureCube";
 import MouseCameraHelper from "../utils/MouseCameraHelper";
+import ColorHeightMap from "../primitives/ColorHeightMap";
+import ObjParser from "../parsers/obj/ObjParser";
+import ObjGeometry from "../parsers/obj/ObjGeometry";
+import EulerAngle from "../math/EulerAngle";
 /**
  * Created by yaozh on 2017/7/6.
  */
@@ -38,6 +42,9 @@ export default class ModelAndTexture extends Example
 
     private skyCube:Mesh;
 
+    private terrain:Mesh;
+    private drone:Mesh;
+
     public run():void
     {
         AssetsManager.getInstance().addGroup([
@@ -51,7 +58,7 @@ export default class ModelAndTexture extends Example
 
             new AssetData('cube_mat_vshader', AssetData.TEXT, './src/shaders/cube_material/base/vert.glsl'),
             new AssetData('cube_mat_fshader', AssetData.TEXT, './src/shaders/cube_material/base/frag.glsl'),
-            new AssetData('sky_n_x', AssetData.IMAGE, './resource/sky_n_x.jpg'),
+            /*new AssetData('sky_n_x', AssetData.IMAGE, './resource/sky_n_x.jpg'),
             new AssetData('sky_n_y', AssetData.IMAGE, './resource/sky_n_y.jpg'),
             new AssetData('sky_n_z', AssetData.IMAGE, './resource/sky_n_z.jpg'),
             new AssetData('sky_p_x', AssetData.IMAGE, './resource/sky_p_x.jpg'),
@@ -63,7 +70,13 @@ export default class ModelAndTexture extends Example
             new AssetData('cloudy_noon_nz', AssetData.IMAGE, './resource/cloudy_noon_nz.jpg'),
             new AssetData('cloudy_noon_px', AssetData.IMAGE, './resource/cloudy_noon_px.jpg'),
             new AssetData('cloudy_noon_py', AssetData.IMAGE, './resource/cloudy_noon_py.jpg'),
-            new AssetData('cloudy_noon_pz', AssetData.IMAGE, './resource/cloudy_noon_pz.jpg')
+            new AssetData('cloudy_noon_pz', AssetData.IMAGE, './resource/cloudy_noon_pz.jpg'),*/
+
+            new AssetData('land', AssetData.IMAGE, './resource/land.png'),
+            new AssetData('grass', AssetData.IMAGE, './resource/grass.png'),
+
+            new AssetData('drone', AssetData.TEXT, './resource/drone.obj')
+            //new AssetData('drone_diffuse', AssetData.IMAGE, './resource/drone_diffuse_01.png')
         ]);
         AssetsManager.getInstance().addEventListener(AssetsManager.GROUP_LOAD_COMPLETE, this.loadComplete, this);
         AssetsManager.getInstance().load();
@@ -79,7 +92,7 @@ export default class ModelAndTexture extends Example
         //this.scene.initialize();
 
         this.camera = new PerspectiveCamera();
-        this.camera.position = new Vector3(0.0, 0, 20.0);
+        this.camera.position = new Vector3(0.0, 25, 35.0);
         this.scene.currentCamera = this.camera;
         this.camera.lookAt(new Vector3(0.0, 0.0, 0.0), Vector3.UP);
         MouseCameraHelper.attach(this.camera);
@@ -138,7 +151,7 @@ export default class ModelAndTexture extends Example
         this.teapot.scale = new Vector3(0.15, 0.15, 0.15);
         this.scene.addMesh(this.teapot);
 
-        let cubeMate:CubeMapMaterial = new CubeMapMaterial();
+        /*let cubeMate:CubeMapMaterial = new CubeMapMaterial();
         let cubeTexture:TextureCube = new TextureCube([
             AssetsManager.getInstance().getAsset('cloudy_noon_px'),
             AssetsManager.getInstance().getAsset('cloudy_noon_nx'),
@@ -150,15 +163,26 @@ export default class ModelAndTexture extends Example
         cubeMate.textureCube = cubeTexture;
         let skyBox:SkyBox = new SkyBox(80, cubeMate);
         skyBox.position = this.camera.position;
-        this.scene.addMesh(skyBox);
+        this.scene.addMesh(skyBox);*/
 
-        /*this.skyCube = new Mesh(new Cube(40, 40, 40), cubeMat);
-        this.scene.addMesh(this.skyCube);
-        this.skyCube.surfaceSide = Mesh.SURFACE_SIDE_BACK;
-        this.skyCube.position = this.camera.position;*/
+        let img:HTMLImageElement = AssetsManager.getInstance().getAsset('land');
+        let terrainMat:StandardMaterial = new StandardMaterial();
+        terrainMat.texture = new Texture2D(AssetsManager.getInstance().getAsset('grass'));
+        this.terrain = new Mesh(new ColorHeightMap(img), terrainMat);
+        this.terrain.position = new Vector3(0, -20, 0);
+        this.scene.addMesh(this.terrain);
+
+        let droneMat:StandardMaterial = new StandardMaterial();
+        droneMat.emissiveColor = new Vector3(0.6, 0.6, 0.6);
+        //droneMat.texture = new Texture2D(AssetsManager.getInstance().getAsset('drone_diffuse'));
+        let objparser:ObjParser = new ObjParser(AssetsManager.getInstance().getAsset('drone'));
+        this.drone = new Mesh(new ObjGeometry(objparser), droneMat);
+        this.drone.position = new Vector3(-10, 8, 3);
+        this.drone.rotation.x = 90;
+        this.drone.scale = new Vector3(0.005, 0.005,0.005);
+        this.scene.addMesh(this.drone);
 
         this.engine.setScene(this.scene);
-
         this.engine.start();
     }
 
@@ -187,6 +211,9 @@ export default class ModelAndTexture extends Example
         this.pointSphere.translate(0.1, Vector3.UP);
         this.pointSphere.rotation.z += 0.02;
 
+
+        this.drone.translate(-0.1, Vector3.UP);
+        this.drone.rotation.z += 0.01;
 
         this.scene.draw();
     }

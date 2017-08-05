@@ -66,7 +66,7 @@ export default class StandardMaterialResolver extends MaterialResolver
             mesh.a_UV = gl.getAttribLocation(glProgram, 'a_TexCood');
             mesh.uvBuffer = mesh.createArrayBuffer(geometry.uvs);
         }
-        mesh.indexBuffer = mesh.createIndexBuffer();
+        if (mesh.geometry.indexDraw)mesh.indexBuffer = mesh.createIndexBuffer();
     }
 
     public resetAttribsAndUniforms():void
@@ -210,6 +210,6 @@ export default class StandardMaterialResolver extends MaterialResolver
         {
             //console.log(this._material.texture, this._mesh.geometry);
         }
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, mesh.indexBuffer);
+        if (mesh.geometry.indexDraw)gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, mesh.indexBuffer);
     }
 }
