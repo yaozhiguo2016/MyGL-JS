@@ -1,5 +1,5 @@
 import RenderContext from "../RenderContext";
-import ShaderUtil from "../utils/ShaderUtil";
+import ShaderUtil from "./ShaderUtil";
 /**
  * Created by yaozh on 2017/6/27.
  */

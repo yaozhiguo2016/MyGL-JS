@@ -21,4 +21,4 @@ gulp
 下图演示了场景中模型变换，平行光和点光源,高度地形图，Obj文件解析，在线浏览：
 <http://works.yaozhiguo.site/mygl/>
 
-![快照](https://github.com/yaozhiguo2016/MyGL-JS/blob/master/screeshot.png)
+![快照](https://github.com/yaozhiguo2016/MyGL-JS/blob/master/screenshot.png)

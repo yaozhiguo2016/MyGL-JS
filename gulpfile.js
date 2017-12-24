@@ -18,14 +18,16 @@ var tsify = require("tsify");
 var browserify_shim = require('browserify-shim');
 var assign = require('lodash.assign');
 
+require('./compress_shader')();
+
 var dest = 'dist';
 var src = 'src';
 
 // 在这里添加自定义 browserify 选项
 var customOpts = {
     entries: [src + '/index.js'],
-    extensions: ['.js', '.ts'],
-    debug: true,
+    extensions: ['.ts'],
+    debug: true
     // standalone: 'Main'
 };
 
@@ -67,24 +69,17 @@ gulp.task('css', function(){
         .pipe(gulp.dest(dest + '/css'));
 });
 
-gulp.task('libs', function(){
-    gulp.src('ace-lib/**/*')
-        .pipe(gulp.dest(dest + '/ace-lib'));
-    gulp.src('aether-lib/**/*')
-        .pipe(gulp.dest(dest + '/aether-lib'));
-    gulp.src('aether-plugin/**/*')
-        .pipe(gulp.dest(dest + '/aether-plugin'));
-
-    return gulp.src('libs/**/*.js')
-        .pipe(gulp.dest(dest + '/libs'));
-});
-
 gulp.task('html', function(){
     return gulp.src('*.html')
         .pipe(gulp.dest(dest))
 });
 
-gulp.task('dist', ['html', 'css', 'libs', 'scripts']);
+gulp.task('glsl', function () {
+    console.log('glsl');
+    return gulp.src('./src/shaders/**/*.glsl').pipe(glsl()).pipe(gulp.dest(dest + '/shader'));
+});
+
+gulp.task('dist', ['html', 'css', 'glsl','scripts']);
 
 gulp.task('webserver', function () {
     connect.server({
@@ -94,33 +89,10 @@ gulp.task('webserver', function () {
     });
 });
 
-function getFolders( dir ) {
-    return fs.readdirSync( dir )
-        .filter( function( file ) {
-            return fs.statSync( path.join(dir, file) ).isDirectory();
-        });
-}
-
-gulp.task('js-compress', function() {
-    var folders = getFolders('lib/ace/');
-
-    var tasks = folders.map( function(folder) {
-        return gulp.src(path.join('lib/ace/', folder, '/*.js'))
-            .pipe(uglify())
-            .pipe(gulp.dest(path.join('lib/ace/', folder)));
-        // .pipe(rename(folder + '.min.js'))
-        // .pipe(gulp.dest(path.join(srcPath, folder)));
-    });
-    // return tasks;
-
-    gulp.src(path.join('lib/ace/', '/*.js')).pipe(uglify())
-        .pipe(gulp.dest('lib/ace/'));
-});
-
 gulp.task('main-compress', function(){
     gulp.src('dist/mygl.js').pipe(uglify({
         mangle:false
-    })).pipe(gulp.dest('dist/min'))
+    })).pipe(gulp.dest('dist/min/'))
 });
 
 gulp.task('default', ['scripts', 'webserver']);

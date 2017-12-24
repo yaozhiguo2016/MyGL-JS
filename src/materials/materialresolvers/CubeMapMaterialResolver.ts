@@ -2,12 +2,12 @@ import MaterialResolver from "./MaterialResolver";
 import RenderContext from "../../RenderContext";
 import Mesh from "../../core/Mesh";
 import Geometry from "../../primitives/Geometry";
-import GLProgramLib from "../../shaders/GLProgramLib";
+import GLProgramLib from "../../utils/GLProgramLib";
 import ShaderUtil from "../../utils/ShaderUtil";
-import AssetsManager from "../../managers/AssetsManager";
 import CubeMapMaterial from "../CubeMapMaterial";
 import UniformUtil from "../../utils/UniformUtil";
 import Camera from "../../cameras/Camera";
+import ShaderLib from '../../utils/ShaderLib';
 /**
  * Created by yaozh on 2017/7/6.
  */
@@ -19,13 +19,10 @@ export default class CubeMapMaterialResolver extends MaterialResolver
         let mesh:Mesh = this._mesh;
         let geometry:Geometry = mesh.geometry;
 
-        let glProgram:WebGLProgram;
-            glProgram = GLProgramLib.getProgram(this._material.type);
-            if (!glProgram)
+        let glProgram:WebGLProgram = GLProgramLib.getProgram(this._material.type);
+        if (!glProgram)
         {
-            glProgram = ShaderUtil.createProgram(gl,
-                AssetsManager.getInstance().getAsset('cube_mat_vshader'),
-                AssetsManager.getInstance().getAsset('cube_mat_fshader'));
+            glProgram = ShaderUtil.createProgram(gl, ShaderLib['cubemap_vert.glsl'], ShaderLib['cubemap_frag.glsl']);
             GLProgramLib.addProgram(this._material.type, glProgram);
         }
 

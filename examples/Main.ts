@@ -2,8 +2,8 @@
 /**
  * Created by yaozh on 2017/5/25.
  */
-import Example from "./examples/Example";
-import ModelAndTexture from "./examples/ModelAndTexture";
+import Example from "../examples/tests/Example";
+import ModelAndTexture from "../examples/tests/ModelAndTexture";
 
 export default class Main
 {

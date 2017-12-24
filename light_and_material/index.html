@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Light And Material</title>
+
+    <!-- Demonstrates the use of light and material in WebGL by showing three
+    colored lights going around a teapot, plus a white viewpoint light. -->
+
+    <script type="x-shader/x-vertex" id="vshader">
+     attribute vec3 coords;
+     attribute vec3 normal;
+     uniform mat4 modelview;
+     uniform mat4 projection;
+     varying vec3 viewCoords;
+     varying vec3 vNormal;
+     void main() {
+        vec4 tcoords = modelview*vec4(coords,1.0);
+        viewCoords = tcoords.xyz;
+        gl_Position = projection * tcoords;
+        vNormal = normal;
+     }
+</script>
+
+    <script type="x-shader/x-fragment" id="fshader">
+     precision mediump float;
+     struct materialProperties {  // A type that defines the set of material properties.
+        vec3 ambient;
+        vec3 diffuse;
+        vec3 specular;
+        vec3 emissive;
+        float shininess;
+     };
+     struct lightProperties {  // A type that defines the set of light properties.
+        vec4 position;   // position.z == 0 for a directional light, and 1 for a positional light
+        vec3 intensity;  // This is the color, but not restricted to the range 0 to 1.
+        vec3 ambient;    // Amount added to global ambient when this light is enabled.
+        bool enabled;
+     };
+     uniform materialProperties frontMaterial; // material for front faces (and for back faces if twoSided is false)
+     uniform materialProperties backMaterial;  // material for back faces, used only if twoSided is true
+     materialProperties material; // This is the material that will actually be used on this fragment
+     uniform bool twoSided;  // If true, back faces will have a different material from front faces
+     uniform mat3 normalMatrix;  // Matrix for transforming the normal vector.
+     uniform lightProperties light[4];  // data for four lights
+     uniform bool lit; // If false, no lighting is done; instead the unmodified diffuse material color is used.
+     uniform vec3 globalAmbient; // amount of global ambient illumination, independent of the four lights.
+     varying vec3 viewCoords;    // position in viewing coordinates, used for lighting
+     varying vec3 vNormal;  // The interpolated normal vector.
+
+     vec3 lighting(vec3 vertex, vec3 V, vec3 N) {
+            // A function to compute the color of this fragment using the lighting equation.
+            // vertex contains the coords of the points; V is a unit vector pointing to viewer;
+            // N is the normal vector.  This function also uses the values in the global variables
+            // material and light[0]..light[3].
+        vec3 color = material.emissive + material.ambient * globalAmbient;
+        for (int i = 0; i < 4; i++) {
+            if (!light[i].enabled)continue;
+                color += material.ambient * light[i].ambient;
+                vec3 L;
+                if (light[i].position.w == 0.0)
+                   L = normalize( light[i].position.xyz );
+                else
+                   L = normalize( light[i].position.xyz/light[i].position.w - vertex );
+                if ( dot(L,N) > 0.0) {
+                   vec3 R;
+                   R = (2.0*dot(N,L))*N - L;
+                   color += dot(N,L)*(light[i].intensity*material.diffuse);
+                   if ( dot(V,R) > 0.0)
+                      color += pow(dot(V,R),material.shininess) * (light[i].intensity * material.specular);
+                }
+
+        }
+        return color;
+     }
+
+     void main() {
+        if (lit) {
+           vec3 tnormal = normalize(normalMatrix*vNormal);
+           if (!gl_FrontFacing)
+               tnormal = -tnormal;
+           if ( gl_FrontFacing || !twoSided)
+              material = frontMaterial;
+           else
+              material = backMaterial;
+           gl_FragColor = vec4( lighting(viewCoords, normalize(-viewCoords),tnormal), 1.0 );
+        }
+        else {
+           if ( gl_FrontFacing || !twoSided )
+               gl_FragColor = vec4(frontMaterial.diffuse, 1.0);
+           else
+               gl_FragColor = vec4(backMaterial.diffuse, 1.0);
+        }
+     }
+</script>
+
+
+    <script type="text/javascript" src="gl-matrix-min.js"></script>
+    <script type="text/javascript" src="basic-objects-IFS.js"></script>
+    <script type="text/javascript" src="simple-rotator.js"></script>
+
+    <script type="text/javascript">
+
+        "use strict";
+
+        var gl;    // The webgl context.
+        var prog;  // The shader program.
+
+        var aCoords, aNormal;  // Locations for attribute variables.
+
+        var uProjection, uModelview, uNormalMatrix;  // Locations of uniform matrices.
+
+        var uLit, uTwoSided, uGlobalAmbient;  // Locations of uniforms related to lighting and materials.
+        var uFrontMaterial, uBackMaterial;  // Objects holding locations for material uniforms.
+                                            // (Note: back materials are not used in this program.)
+        var uLight; // Array of objects holding holding locations for light uniforms.
+
+        var cylinder, sphere, teapot;  // Objects holding data for rendering objects.
+
+        var projection = mat4.create();   // The projection transformation matrix.
+        var modelview;  // The modelview matrix (to be created by the simpleRotator object, not by mat4).
+        var normalMatrix = mat3.create();  // The matrix for transforming normal vectors.
+
+        var rotator;  // a simple rotator object for rotating the scene as a whole.
+
+        var frameNumber = 0;  // Frame number for animation.
+
+        /**
+         * Draw the scene, consisting of a teapot on a base.  The teapot has specular reflection,
+         * the base does not.  Three spheres circle the teapot, with a point light at the same
+         * location of each sphere.  The spheres/lights are red, green, and blue.
+         */
+        function render() {
+
+            gl.clearColor(0,0,0,1);
+            gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+            mat4.perspective(projection, Math.PI/3, 1, 1, 50);
+            gl.uniformMatrix4fv(uProjection, false, projection);
+
+            modelview = rotator.getViewMatrix();
+
+            var saveMV = mat4.clone(modelview);
+
+            var pos = vec4.create(); // For setting the light positions
+
+            gl.uniform3f(uFrontMaterial.specular, 0,0,0);  // Only the teapot will have specular reflection.
+
+            /* Draw the red light and the red sphere */
+
+            gl.uniform3f(uFrontMaterial.diffuse, 0.6, 0, 0);
+            gl.uniform3f(uFrontMaterial.ambient, 0.2, 0, 0);
+            mat4.rotateX(modelview,modelview,(frameNumber+284)/127);
+            mat4.rotateY(modelview,modelview,(frameNumber+152)/87);
+            mat4.translate(modelview,modelview,[7,0,0]);
+            vec4.transformMat4(pos,[0,0,0,1],modelview);
+            // Note:  The light position must be transformed by the modelview matrix
+            // The value of the light position is the position in eye coordinates.
+            // Just like the sphere, the untransformed light position is (0,0,0).
+            gl.uniform4fv(uLight[1].position, pos);
+            sphere.render();
+
+            /* Draw the green light and sphere. */
+
+            modelview = mat4.clone(saveMV);
+            gl.uniform3f(uFrontMaterial.specular, 0,0,0);
+            gl.uniform3f(uFrontMaterial.diffuse, 0, 0.6, 0);
+            gl.uniform3f(uFrontMaterial.ambient, 0, 0.2, 0);
+            mat4.rotateX(modelview,modelview,frameNumber/110);
+            mat4.rotateY(modelview,modelview,frameNumber/93);
+            mat4.translate(modelview,modelview,[6,0,0]);
+            vec4.transformMat4(pos,[0,0,0,1],modelview);
+            gl.uniform4fv(uLight[2].position, pos);
+            sphere.render();
+
+            /* Draw the blue light and sphere. */
+
+            modelview = mat4.clone(saveMV);
+            gl.uniform3f(uFrontMaterial.specular, 0,0,0);
+            gl.uniform3f(uFrontMaterial.diffuse, 0, 0, 0.6);
+            gl.uniform3f(uFrontMaterial.ambient, 0, 0, 0.2);
+            mat4.rotateX(modelview,modelview,(frameNumber+35)/91);
+            mat4.rotateY(modelview,modelview,(frameNumber+183)/73);
+            mat4.translate(modelview,modelview,[8,0,0]);
+            vec4.transformMat4(pos,[0,0,0,1],modelview);
+            gl.uniform4fv(uLight[3].position, pos);
+            sphere.render();
+
+            /* Draw the base. */
+
+            modelview = mat4.clone(saveMV);
+            mat4.translate(modelview,modelview,[0,-2.5,0]);
+            mat4.rotateX(modelview,modelview,Math.PI/2);
+            gl.uniform3f(uFrontMaterial.diffuse, 0.6, 0.6, 0.6);
+            gl.uniform3f(uFrontMaterial.ambient, 0.1, 0.1, 0.1);
+            cylinder.render();
+
+            /* Draw the teapot. */
+
+            modelview = saveMV;
+            mat4.scale(modelview,modelview, [0.3,0.3,0.3] );
+            gl.uniform3f(uFrontMaterial.specular, 0.3,0.3,0.3);  // Specular reflection for the teapot.
+            teapot.render();
+        }
+
+
+        /**
+         *  Gets attribute and uniform locations and initializes uniform variables.
+         */
+        function setUpAttribsAndUniforms() {
+            aCoords = gl.getAttribLocation(prog,"coords");
+            aNormal = gl.getAttribLocation(prog,"normal");
+            uProjection = gl.getUniformLocation(prog,"projection");
+            uModelview = gl.getUniformLocation(prog,"modelview");
+            uNormalMatrix = gl.getUniformLocation(prog,"normalMatrix");
+            uLit = gl.getUniformLocation(prog,"lit");
+            uTwoSided = gl.getUniformLocation(prog,"twoSided");
+            uGlobalAmbient = gl.getUniformLocation(prog,"globalAmbient");
+            uFrontMaterial = {};
+            uFrontMaterial.ambient = gl.getUniformLocation(prog,"frontMaterial.ambient");
+            uFrontMaterial.diffuse = gl.getUniformLocation(prog,"frontMaterial.diffuse");
+            uFrontMaterial.specular = gl.getUniformLocation(prog,"frontMaterial.specular");
+            uFrontMaterial.emission = gl.getUniformLocation(prog,"frontMaterial.emissive");
+            uFrontMaterial.shininess = gl.getUniformLocation(prog,"frontMaterial.shininess");
+            uBackMaterial = {};
+            uBackMaterial.ambient = gl.getUniformLocation(prog,"backMaterial.ambient");
+            uBackMaterial.diffuse = gl.getUniformLocation(prog,"backMaterial.diffuse");
+            uBackMaterial.specular = gl.getUniformLocation(prog,"backMaterial.specular");
+            uBackMaterial.emission = gl.getUniformLocation(prog,"backMaterial.emissive");
+            uBackMaterial.shininess = gl.getUniformLocation(prog,"backMaterial.shininess");
+            uLight = [];
+            for (var i = 0; i < 4; i++) {
+                uLight[i] = {};
+                uLight[i].position = gl.getUniformLocation(prog,"light[" + i + "].position");
+                uLight[i].intensity = gl.getUniformLocation(prog,"light[" + i + "].intensity");
+                uLight[i].ambient = gl.getUniformLocation(prog,"light[" + i + "].ambient");
+                uLight[i].enabled = gl.getUniformLocation(prog,"light[" + i + "].enabled");
+            }
+            var identity4 = mat4.create();
+            gl.uniformMatrix4fv(uProjection, false, identity4);
+            gl.uniformMatrix4fv(uModelview, false, identity4);
+            var identity3 = mat3.create();
+            gl.uniformMatrix3fv(uNormalMatrix, false, identity3);
+            gl.uniform1i(uLit, 1);
+            gl.uniform1i(uTwoSided, 0);
+            gl.uniform3f(uGlobalAmbient, 1, 1, 1);
+            gl.uniform3f(uFrontMaterial.ambient, 0.1, 0.1, 0.1);
+            gl.uniform3f(uFrontMaterial.diffuse, 0.6, 0.6, 0.6);
+            gl.uniform3f(uFrontMaterial.specular, 0.3, 0.3, 0.3);
+            gl.uniform3f(uFrontMaterial.emission, 0, 0, 0);
+            gl.uniform1f(uFrontMaterial.shininess, 50);
+            gl.uniform3f(uBackMaterial.ambient, 0.1, 0.1, 0.1);
+            gl.uniform3f(uBackMaterial.diffuse, 0.3, 0.6, 0.6);
+            gl.uniform3f(uBackMaterial.specular, 0.3, 0.3, 0.3);
+            gl.uniform3f(uBackMaterial.emission, 0, 0, 0);
+            gl.uniform1f(uBackMaterial.shininess, 50);
+            for (i = 0; i < 4; i++) {
+                gl.uniform4f(uLight[i].position, 0, 0, 1, 0);
+                gl.uniform3f(uLight[i].ambient, 0, 0, 0);
+                if (i == 0) {
+                    gl.uniform3f(uLight[i].intensity, 1, 1, 1);
+                    gl.uniform1i(uLight[i].enabled, 1);
+                }
+                else {
+                    gl.uniform3f(uLight[i].intensity, 0, 0, 0);
+                    gl.uniform1i(uLight[i].enabled, 0);
+                }
+            }
+        }
+
+        /**
+         *  Create one of the basic objects.  The modelData holds the data for
+         *  an IFS using the structure from basic-objects-IFS.js.  This function
+         *  creates VBOs to hold the coordinates, normal vectors, and indices
+         *  from the IFS, and it loads the data into those buffers.  The function
+         *  creates a new object whose properties are the identifiers of the
+         *  VBOs.  The new object also has a function, render(), that can be called to
+         *  render the object, using all the data from the buffers.  That object
+         *  is returned as the value of the function.
+         */
+        function createModel(modelData) {
+            var model = {};
+            model.coordsBuffer = gl.createBuffer();
+            model.normalBuffer = gl.createBuffer();
+            model.indexBuffer = gl.createBuffer();
+            model.count = modelData.indices.length;
+            gl.bindBuffer(gl.ARRAY_BUFFER, model.coordsBuffer);
+            gl.bufferData(gl.ARRAY_BUFFER, modelData.vertexPositions, gl.STATIC_DRAW);
+            gl.bindBuffer(gl.ARRAY_BUFFER, model.normalBuffer);
+            gl.bufferData(gl.ARRAY_BUFFER, modelData.vertexNormals, gl.STATIC_DRAW);
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, model.indexBuffer);
+            gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, modelData.indices, gl.STATIC_DRAW);
+            model.render = function() {  // This function will render the object.
+                gl.bindBuffer(gl.ARRAY_BUFFER, this.coordsBuffer);
+                gl.vertexAttribPointer(aCoords, 3, gl.FLOAT, false, 0, 0);
+                gl.bindBuffer(gl.ARRAY_BUFFER, this.normalBuffer);
+                gl.vertexAttribPointer(aNormal, 3, gl.FLOAT, false, 0, 0);
+                gl.uniformMatrix4fv(uModelview, false, modelview );
+                mat3.normalFromMat4(normalMatrix, modelview);
+                gl.uniformMatrix3fv(uNormalMatrix, false, normalMatrix);
+                gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
+                gl.drawElements(gl.TRIANGLES, this.count, gl.UNSIGNED_SHORT, 0);
+            }
+            return model;
+        }
+
+
+        /* Creates a program for use in the WebGL context gl, and returns the
+         * identifier for that program.  If an error occurs while compiling or
+         * linking the program, an exception of type String is thrown.  The error
+         * string contains the compilation or linking error.  If no error occurs,
+         * the program identifier is the return value of the function.
+         */
+        function createProgram(gl, vertexShaderSource, fragmentShaderSource) {
+            var vsh = gl.createShader( gl.VERTEX_SHADER );
+            gl.shaderSource(vsh,vertexShaderSource);
+            gl.compileShader(vsh);
+            if ( ! gl.getShaderParameter(vsh, gl.COMPILE_STATUS) ) {
+                throw "Error in vertex shader:  " + gl.getShaderInfoLog(vsh);
+            }
+            var fsh = gl.createShader( gl.FRAGMENT_SHADER );
+            gl.shaderSource(fsh, fragmentShaderSource);
+            gl.compileShader(fsh);
+            if ( ! gl.getShaderParameter(fsh, gl.COMPILE_STATUS) ) {
+                throw "Error in fragment shader:  " + gl.getShaderInfoLog(fsh);
+            }
+            var prog = gl.createProgram();
+            gl.attachShader(prog,vsh);
+            gl.attachShader(prog, fsh);
+            gl.linkProgram(prog);
+            if ( ! gl.getProgramParameter( prog, gl.LINK_STATUS) ) {
+                throw "Link error in program:  " + gl.getProgramInfoLog(prog);
+            }
+            return prog;
+        }
+
+
+        /* Gets the text content of an HTML element.  This is used
+         * to get the shader source from the script elements that contain
+         * it.  The parameter should be the id of the script element.
+         */
+        function getTextContent( elementID ) {
+            var element = document.getElementById(elementID);
+            var fsource = "";
+            var node = element.firstChild;
+            var str = "";
+            while (node) {
+                if (node.nodeType == 3) // this is a text node
+                    str += node.textContent;
+                node = node.nextSibling;
+            }
+            return str;
+        }
+
+
+        //--------------------------------- animation framework ------------------------------
+
+        window.requestAnimationFrame =
+            window.requestAnimationFrame ||
+            window.mozRequestAnimationFrame ||
+            window.webkitRequestAnimationFrame ||
+            window.msRequestAnimationFrame ||
+            window.oRequestAnimationFrame ||
+            function (callback) {
+                setTimeout(function() { callback(Date.now()); },  1000/60);
+            }
+
+        var animating = false;
+
+        function frame() {
+            if (animating) {
+                frameNumber += 1;
+                render();
+                requestAnimationFrame(frame);
+            }
+        }
+
+        function setAnimating(run) {
+            if (run != animating) {
+                animating = run;
+                if (animating)
+                    requestAnimationFrame(frame);
+            }
+        }
+
+        //-------------------------------------------------------------------------
+
+        function init() {
+            try {
+                var canvas = document.getElementById("glcanvas");
+                gl = canvas.getContext("webgl");
+                if ( ! gl ) {
+                    gl = canvas.getContext("experimental-webgl");
+                }
+                if ( ! gl ) {
+                    throw "Could not create WebGL context.";
+                }
+                var vertexShaderSource = getTextContent("vshader");
+                var fragmentShaderSource = getTextContent("fshader");
+                prog = createProgram(gl,vertexShaderSource,fragmentShaderSource);
+            }
+            catch (e) {
+                document.getElementById("message").innerHTML =
+                    "Could not initialize WebGL: " + e;
+                return;
+            }
+
+            gl.useProgram(prog);
+
+            setUpAttribsAndUniforms();
+            gl.enableVertexAttribArray(aCoords);  // won't change after initialization.
+            gl.enableVertexAttribArray(aNormal);
+            gl.enable(gl.DEPTH_TEST);
+
+            sphere = createModel(uvSphere(0.3));
+            cylinder = createModel(uvCylinder(4,0.5,64));
+            teapot = createModel(teapotModel);
+
+            rotator = new SimpleRotator(canvas,render);
+            rotator.setView( [0, 1, 2], [0,1,0], 16);
+            document.getElementById("anim").checked = true;
+            document.getElementById("l0").checked = true;
+            document.getElementById("l1").checked = true;
+            document.getElementById("l2").checked = true;
+            document.getElementById("l3").checked = true;
+
+            gl.uniform1f(uLight[1].enabled, 1);         // Turn on lights 1,2, and 3 and set their colors.
+            gl.uniform3f(uLight[1].intensity, .5,0,0);
+            gl.uniform1f(uLight[2].enabled, 1);
+            gl.uniform3f(uLight[2].intensity, 0,.5,0);
+            gl.uniform1f(uLight[3].enabled, 1);
+            gl.uniform3f(uLight[3].intensity, 0,0,.5);
+
+            setAnimating(true);
+        }
+
+
+
+    </script>
+</head>
+<body onload="init()" style="background-color:#DDD">
+
+<h2>A WebGL Example with Light and Material</h2>
+
+<noscript><hr><h3>This page requires Javascript and a web browser that supports WebGL</h3><hr></noscript>
+
+<p id="message" style="font-weight:bold">Drag your mouse on the canvas to rotate the scene.</p>
+
+<p>
+    <input type="checkbox" id="anim" onchange="setAnimating(this.checked)"> <label for="anim">Animate</label>
+    <button onclick="rotator.setView( [0,0,16], [0,1,0] ); frameNumber = 0; render()" style="margin-left:2cm">Reset View</button>
+    <span style="margin-left:1.5cm">Lights:</span>
+    <input type=checkbox id="l0" onchange="gl.uniform1f(uLight[0].enabled,this.checked); render()"> <label for="l0">0</label>&nbsp;&nbsp;
+    <input type=checkbox id="l1" onchange="gl.uniform1f(uLight[1].enabled,this.checked); render()"> <label for="l1">1</label>&nbsp;&nbsp;
+    <input type=checkbox id="l2" onchange="gl.uniform1f(uLight[2].enabled,this.checked); render()"> <label for="l2">2</label>&nbsp;&nbsp;
+    <input type=checkbox id="l3" onchange="gl.uniform1f(uLight[3].enabled,this.checked); render()"> <label for="l3">3</label>&nbsp;&nbsp;
+</p>
+
+
+<div>
+
+    <canvas width=600 height=600 id="glcanvas" style="background-color:blue"></canvas>
+
+</div>
+
+
+</body>
+</html>
+
+
