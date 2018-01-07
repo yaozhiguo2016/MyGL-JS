@@ -15,18 +15,18 @@ function Main(){
         //new MyGL.AssetData('cube_mat_vshader', MyGL.AssetData.TEXT, './src/shaders/cube_material/base/vert.glsl'),
         //new MyGL.AssetData('cube_mat_fshader', MyGL.AssetData.TEXT, './src/shaders/cube_material/base/frag.glsl'),
         /*new AssetData('sky_n_x', AssetData.IMAGE, './resource/sky_n_x.jpg'),
-         new AssetData('sky_n_y', AssetData.IMAGE, './resource/sky_n_y.jpg'),
-         new AssetData('sky_n_z', AssetData.IMAGE, './resource/sky_n_z.jpg'),
-         new AssetData('sky_p_x', AssetData.IMAGE, './resource/sky_p_x.jpg'),
-         new AssetData('sky_p_y', AssetData.IMAGE, './resource/sky_p_y.jpg'),
-         new AssetData('sky_p_z', AssetData.IMAGE, './resource/sky_p_z.jpg'),*/
+        new AssetData('sky_n_y', AssetData.IMAGE, './resource/sky_n_y.jpg'),
+        new AssetData('sky_n_z', AssetData.IMAGE, './resource/sky_n_z.jpg'),
+        new AssetData('sky_p_x', AssetData.IMAGE, './resource/sky_p_x.jpg'),
+        new AssetData('sky_p_y', AssetData.IMAGE, './resource/sky_p_y.jpg'),
+        new AssetData('sky_p_z', AssetData.IMAGE, './resource/sky_p_z.jpg'),*/
 
-         new MyGL.AssetData('cloudy_noon_nx', MyGL.AssetData.IMAGE, './resource/cloudy_noon_nx.jpg'),
-         new MyGL.AssetData('cloudy_noon_ny', MyGL.AssetData.IMAGE, './resource/cloudy_noon_ny.jpg'),
-         new MyGL.AssetData('cloudy_noon_nz', MyGL.AssetData.IMAGE, './resource/cloudy_noon_nz.jpg'),
-         new MyGL.AssetData('cloudy_noon_px', MyGL.AssetData.IMAGE, './resource/cloudy_noon_px.jpg'),
-         new MyGL.AssetData('cloudy_noon_py', MyGL.AssetData.IMAGE, './resource/cloudy_noon_py.jpg'),
-         new MyGL.AssetData('cloudy_noon_pz', MyGL.AssetData.IMAGE, './resource/cloudy_noon_pz.jpg'),
+        new MyGL.AssetData('cloudy_noon_nx', MyGL.AssetData.IMAGE, './resource/cloudy_noon_nx.jpg'),
+        new MyGL.AssetData('cloudy_noon_ny', MyGL.AssetData.IMAGE, './resource/cloudy_noon_ny.jpg'),
+        new MyGL.AssetData('cloudy_noon_nz', MyGL.AssetData.IMAGE, './resource/cloudy_noon_nz.jpg'),
+        new MyGL.AssetData('cloudy_noon_px', MyGL.AssetData.IMAGE, './resource/cloudy_noon_px.jpg'),
+        new MyGL.AssetData('cloudy_noon_py', MyGL.AssetData.IMAGE, './resource/cloudy_noon_py.jpg'),
+        new MyGL.AssetData('cloudy_noon_pz', MyGL.AssetData.IMAGE, './resource/cloudy_noon_pz.jpg'),
 
         new MyGL.AssetData('land', MyGL.AssetData.IMAGE, './resource/land.png'),
         new MyGL.AssetData('grass', MyGL.AssetData.IMAGE, './resource/grass.png'),
@@ -38,10 +38,6 @@ function Main(){
     MyGL.AssetsManager.getInstance().load();
 }
 
-Main.prototype.start = function(){
-
-};
-
 Main.prototype.loadComplete = function(event){
     console.log(event);
     this.engine = new MyGL.Engine(true);
@@ -51,8 +47,9 @@ Main.prototype.loadComplete = function(event){
     //this.scene.ambientColor = new Vector3(0, 0,0);
     //this.scene.initialize();
 
+    //透视摄影机
     this.camera = new MyGL.PerspectiveCamera();
-    this.camera.position = new MyGL.Vector3(0.0, 25, 35.0);
+    this.camera.position = new MyGL.Vector3(0.0, 25, 20.0);
     this.scene.currentCamera = this.camera;
     this.camera.lookAt(new MyGL.Vector3(0.0, 0.0, 0.0), MyGL.Vector3.UP);
     MyGL.MouseCameraHelper.attach(this.camera);
@@ -60,8 +57,9 @@ Main.prototype.loadComplete = function(event){
     var cubeMat = new MyGL.StandardMaterial();
     cubeMat.texture = new MyGL.Texture2D(MyGL.AssetsManager.getInstance().getAsset('img_crate'), true);
 
-    this.cube = new MyGL.Mesh(new MyGL.Cube(2.0, 2, 2), cubeMat);
-    this.cube.position = new MyGL.Vector3(-5, 0.0, 0.0);
+    //立方体
+    this.cube = new MyGL.Mesh(new MyGL.Cube(4, 4, 4), cubeMat);
+    this.cube.position = new MyGL.Vector3(-7, 0.0, 0.0);
     this.scene.addMesh(this.cube);
 
     var colorMaterial = new MyGL.StandardMaterial();
@@ -71,22 +69,26 @@ Main.prototype.loadComplete = function(event){
     colorMaterial.shininess = 50;
     colorMaterial.texture = new MyGL.Texture2D(MyGL.AssetsManager.getInstance().getAsset('img_earth'), true);
 
-    this.sphere = new MyGL.Mesh(new MyGL.Sphere(2, 16, 12),colorMaterial);
-    this.sphere.position = new MyGL.Vector3(5, 0.0, 0.0);
+    //地球
+    this.sphere = new MyGL.Mesh(new MyGL.Sphere(3, 24, 24),colorMaterial);
+    this.sphere.position = new MyGL.Vector3(7, 0.0, 0.0);
     //this.cube.addChild(this.cube2);
     this.scene.addMesh(this.sphere);
 
+    //平面
     this.plane = new MyGL.Mesh(new MyGL.Plane(6, 4),colorMaterial);
     this.plane.position = new MyGL.Vector3(0, 0, 0);
     this.plane.rotation.x = 0.6;
     this.scene.addMesh(this.plane);
     this.plane.surfaceSide = MyGL.Mesh.SURFACE_SIDE_DOUBLE;
 
+    //平行光源
     this.directionLight = new MyGL.DirectionLight();
     this.directionLight.color = new MyGL.Vector3(0.4, 0.0, 0.0);
     this.directionLight.position = new MyGL.Vector3(0, 0, 1);
     this.scene.addLight(this.directionLight);
 
+    //点光源
     this.pointLight = new MyGL.PointLight();
     this.scene.addLight(this.pointLight);
     this.pointLight.color = new MyGL.Vector3(0.6, 0.6, 0.6);
@@ -102,15 +104,17 @@ Main.prototype.loadComplete = function(event){
     this.pointSphere.position.z = 5;
     this.scene.addMesh(this.pointSphere);
 
+    //茶壶
     var teapot = new MyGL.Teapot();
     var sm = new MyGL.StandardMaterial();
     sm.emissiveColor = new MyGL.Vector3(0.2, 0.2, 0.0);
     sm.texture = new MyGL.Texture2D();
     this.teapot = new MyGL.Mesh(teapot, sm);
     this.teapot.position.y = 4;
-    this.teapot.scale = new MyGL.Vector3(0.15, 0.15, 0.15);
+    this.teapot.scale = new MyGL.Vector3(0.2, 0.2, 0.2);
     this.scene.addMesh(this.teapot);
 
+    //立方体盒子
     var cubeMate = new MyGL.CubeMapMaterial();
     var cubeTexture = new MyGL.TextureCube([
         MyGL.AssetsManager.getInstance().getAsset('cloudy_noon_px'),
@@ -135,6 +139,7 @@ Main.prototype.loadComplete = function(event){
     var droneMat = new MyGL.StandardMaterial();
     droneMat.emissiveColor = new MyGL.Vector3(0.6, 0.6, 0.6);
     //droneMat.texture = new Texture2D(AssetsManager.getInstance().getAsset('drone_diffuse'));
+    //加载Obj格式无人机模型
     var objparser = new MyGL.ObjParser(MyGL.AssetsManager.getInstance().getAsset('drone'));
     this.drone = new MyGL.Mesh(new MyGL.ObjGeometry(objparser), droneMat);
     this.drone.position = new MyGL.Vector3(-10, 8, 3);
