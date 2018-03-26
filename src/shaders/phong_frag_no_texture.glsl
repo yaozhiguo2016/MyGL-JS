@@ -48,6 +48,11 @@ uniform float materialShiness;
 varying vec3 v_ViewFragCood;
 varying vec3 v_FragNormal;
 
+/**
+* fragCoodInView 片元在视角坐标系中的坐标
+* viewDirection 视点方向
+* normal 片元法线
+*/
 vec3 lighting(vec3 fragCoodInView, vec3 viewDirection, vec3 normal)
 {
     vec3 color = materialEmissive + materialAmbient * globalAmbient;//环境光反射

@@ -29,3 +29,10 @@ declare module ShaderLib
 {
     function getShader(key:string):ShaderResult;
 }
+
+declare class Stats{
+    dom;
+    showPanel(tag):void;
+    begin():void;
+    end():void;
+}

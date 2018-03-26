@@ -1,6 +1,4 @@
 /**
- * Created by yaozh on 2017/5/25.
+ * Created by yaozh on 2017/12/19.
  */
-Main = require('./Main').default;
-var main = new Main();
-main.start();
+window.MyGL = require('./MyGL').default;

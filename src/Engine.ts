@@ -30,24 +30,21 @@ export default class Engine
 
     public start():void
     {
+        Engine.stats = new Stats();
+        Engine.stats.showPanel( 0 ); // 0: fps, 1: ms, 2: mb, 3+: custom
+        document.body.appendChild( Engine.stats.dom );
         Engine.render();
-        window.setInterval(()=>{
-            document.getElementById('stat').innerHTML = 'fps:' + Engine.fps;
-        }, 1000);
     }
 
-    private static time:number = 0;
-    private static fps:number = 0;
+    private static stats:Stats;
 
     private static render():void
     {
+        Engine.stats.begin();
         if (Engine._loopExecutor){
             Engine._loopExecutor['loopFunc'].call(Engine._loopExecutor['context']);
         }
-        let now:number = Date.now();
-        let delta:number = now - Engine.time;
-        Engine.fps = Math.floor(1000 / delta);
-        Engine.time = now;
+        Engine.stats.end();
         requestAnimationFrame(Engine.render);
     }
 }

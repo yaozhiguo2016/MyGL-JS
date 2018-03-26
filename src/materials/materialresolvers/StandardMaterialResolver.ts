@@ -2,7 +2,7 @@ import MaterialResolver from "./MaterialResolver";
 import Mesh from "../../core/Mesh";
 import RenderContext from "../../RenderContext";
 import Geometry from "../../primitives/Geometry";
-import GLProgramLib from "../../shaders/GLProgramLib";
+import GLProgramLib from "../../utils/GLProgramLib";
 import ShaderUtil from "../../utils/ShaderUtil";
 import AssetsManager from "../../managers/AssetsManager";
 import Vector3 from "../../math/Vector3";
@@ -14,6 +14,7 @@ import Quaternion from "../../math/Quaternion";
 import Matrix4 from "../../math/Matrix4";
 import Scene3D from "../../core/Scene3D";
 import Light from "../../lights/Light";
+import ShaderLib from '../../utils/ShaderLib';
 /**
  * Created by yaozh on 2017/6/28.
  */
@@ -36,9 +37,7 @@ export default class StandardMaterialResolver extends MaterialResolver
             glProgram = GLProgramLib.getProgram(this._material.type);
             if (!glProgram)
             {
-                glProgram = ShaderUtil.createProgram(gl,
-                    AssetsManager.getInstance().getAsset('standard_mat_bp_vshader'),
-                    AssetsManager.getInstance().getAsset('standard_mat_bp_fshader'));
+                glProgram = ShaderUtil.createProgram(gl, ShaderLib['phong_vert.glsl'], ShaderLib['phong_frag.glsl']);
                 GLProgramLib.addProgram(this._material.type, glProgram);
             }
         }
@@ -47,9 +46,7 @@ export default class StandardMaterialResolver extends MaterialResolver
             glProgram = GLProgramLib.getProgram(this._material.type + '_nt');
             if (!glProgram)
             {
-                glProgram = ShaderUtil.createProgram(gl,
-                    AssetsManager.getInstance().getAsset('standard_mat_bp_vshader_nt'),
-                    AssetsManager.getInstance().getAsset('standard_mat_bp_fshader_nt'));
+                glProgram = ShaderUtil.createProgram(gl,ShaderLib['phong_vert_no_texture.glsl'], ShaderLib['phong_frag_no_texture.glsl']);
                 GLProgramLib.addProgram(this._material.type + '_nt', glProgram);
             }
         }

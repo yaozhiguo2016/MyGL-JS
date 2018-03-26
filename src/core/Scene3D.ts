@@ -72,8 +72,8 @@ export default class Scene3D
         gl.enable(gl.DEPTH_TEST);
         // Clear color and depth buffer
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-        //gl.enable(gl.CULL_FACE);
-        //gl.cullFace(gl.BACK);
+        gl.enable(gl.CULL_FACE);
+        gl.cullFace(gl.BACK);
         // Draw the cube
 
         for (let mesh of this._meshes)
