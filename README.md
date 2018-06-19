@@ -10,22 +10,20 @@
 * 资源管理器(AssetsManager)
 * 灰度图地形
 * Obj格式加载和解析
-* 基于Flat，Gouraud，Phong，Blinn-Phong着色模型(未完成)
+* 基于Flat，Gouraud，Phong，Blinn-Phong着色模型
 * 实时阴影(正在进行)
 # install
 npm install
 # run
 gulp
-# visit
-http://localhost:3008
 
 #case screenshot
-下图演示了场景中模型变换，平行光和点光源,高度地形图，Obj文件解析，在线浏览：
-<http://works.yaozhiguo.site/mygl/>
+下图演示了场景中模型变换，平行光和点光源,高度地形图，Obj文件解析等特性
 
 ![快照](https://github.com/yaozhiguo2016/MyGL-JS/blob/master/screenshot.png)
 
-# 案例代码
+#example
+
 <pre><code>
 function Main(){
 
@@ -41,18 +39,18 @@ function Main(){
         //new MyGL.AssetData('cube_mat_vshader', MyGL.AssetData.TEXT, './src/shaders/cube_material/base/vert.glsl'),
         //new MyGL.AssetData('cube_mat_fshader', MyGL.AssetData.TEXT, './src/shaders/cube_material/base/frag.glsl'),
         /*new AssetData('sky_n_x', AssetData.IMAGE, './resource/sky_n_x.jpg'),
-         new AssetData('sky_n_y', AssetData.IMAGE, './resource/sky_n_y.jpg'),
-         new AssetData('sky_n_z', AssetData.IMAGE, './resource/sky_n_z.jpg'),
-         new AssetData('sky_p_x', AssetData.IMAGE, './resource/sky_p_x.jpg'),
-         new AssetData('sky_p_y', AssetData.IMAGE, './resource/sky_p_y.jpg'),
-         new AssetData('sky_p_z', AssetData.IMAGE, './resource/sky_p_z.jpg'),*/
+        new AssetData('sky_n_y', AssetData.IMAGE, './resource/sky_n_y.jpg'),
+        new AssetData('sky_n_z', AssetData.IMAGE, './resource/sky_n_z.jpg'),
+        new AssetData('sky_p_x', AssetData.IMAGE, './resource/sky_p_x.jpg'),
+        new AssetData('sky_p_y', AssetData.IMAGE, './resource/sky_p_y.jpg'),
+        new AssetData('sky_p_z', AssetData.IMAGE, './resource/sky_p_z.jpg'),*/
 
-         new MyGL.AssetData('cloudy_noon_nx', MyGL.AssetData.IMAGE, './resource/cloudy_noon_nx.jpg'),
-         new MyGL.AssetData('cloudy_noon_ny', MyGL.AssetData.IMAGE, './resource/cloudy_noon_ny.jpg'),
-         new MyGL.AssetData('cloudy_noon_nz', MyGL.AssetData.IMAGE, './resource/cloudy_noon_nz.jpg'),
-         new MyGL.AssetData('cloudy_noon_px', MyGL.AssetData.IMAGE, './resource/cloudy_noon_px.jpg'),
-         new MyGL.AssetData('cloudy_noon_py', MyGL.AssetData.IMAGE, './resource/cloudy_noon_py.jpg'),
-         new MyGL.AssetData('cloudy_noon_pz', MyGL.AssetData.IMAGE, './resource/cloudy_noon_pz.jpg'),
+        new MyGL.AssetData('cloudy_noon_nx', MyGL.AssetData.IMAGE, './resource/cloudy_noon_nx.jpg'),
+        new MyGL.AssetData('cloudy_noon_ny', MyGL.AssetData.IMAGE, './resource/cloudy_noon_ny.jpg'),
+        new MyGL.AssetData('cloudy_noon_nz', MyGL.AssetData.IMAGE, './resource/cloudy_noon_nz.jpg'),
+        new MyGL.AssetData('cloudy_noon_px', MyGL.AssetData.IMAGE, './resource/cloudy_noon_px.jpg'),
+        new MyGL.AssetData('cloudy_noon_py', MyGL.AssetData.IMAGE, './resource/cloudy_noon_py.jpg'),
+        new MyGL.AssetData('cloudy_noon_pz', MyGL.AssetData.IMAGE, './resource/cloudy_noon_pz.jpg'),
 
         new MyGL.AssetData('land', MyGL.AssetData.IMAGE, './resource/land.png'),
         new MyGL.AssetData('grass', MyGL.AssetData.IMAGE, './resource/grass.png'),
@@ -92,7 +90,7 @@ Main.prototype.loadComplete = function(event){
     colorMaterial.emissiveColor = new MyGL.Vector3(0.2, 0.2, 0.2);
     colorMaterial.diffuseColor = new MyGL.Vector3(0.2, 0.2, 0.2);
     colorMaterial.specularColor = new MyGL.Vector3(0.5, 0.5, 0.5);
-    colorMaterial.shininess = 30;
+    colorMaterial.shininess = 50;
     colorMaterial.texture = new MyGL.Texture2D(MyGL.AssetsManager.getInstance().getAsset('img_earth'), true);
 
     //地球
@@ -136,10 +134,11 @@ Main.prototype.loadComplete = function(event){
     sm.emissiveColor = new MyGL.Vector3(0.2, 0.2, 0.0);
     sm.texture = new MyGL.Texture2D();
     this.teapot = new MyGL.Mesh(teapot, sm);
-    this.teapot.position.y = 5;
+    this.teapot.position.y = 4;
     this.teapot.scale = new MyGL.Vector3(0.2, 0.2, 0.2);
     this.scene.addMesh(this.teapot);
 
+    //立方体盒子
     var cubeMate = new MyGL.CubeMapMaterial();
     var cubeTexture = new MyGL.TextureCube([
         MyGL.AssetsManager.getInstance().getAsset('cloudy_noon_px'),
@@ -164,7 +163,7 @@ Main.prototype.loadComplete = function(event){
     var droneMat = new MyGL.StandardMaterial();
     droneMat.emissiveColor = new MyGL.Vector3(0.6, 0.6, 0.6);
     //droneMat.texture = new Texture2D(AssetsManager.getInstance().getAsset('drone_diffuse'));
-    //加载Obj格式的无人机模型数据
+    //加载Obj格式无人机模型
     var objparser = new MyGL.ObjParser(MyGL.AssetsManager.getInstance().getAsset('drone'));
     this.drone = new MyGL.Mesh(new MyGL.ObjGeometry(objparser), droneMat);
     this.drone.position = new MyGL.Vector3(-10, 8, 3);

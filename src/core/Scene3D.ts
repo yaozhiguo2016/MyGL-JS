@@ -3,8 +3,6 @@ import Camera from "../cameras/Camera";
 import RenderContext from "../RenderContext";
 import Vector3 from "../math/Vector3";
 import Mesh from "./Mesh";
-import PointLight from "../lights/PointLight";
-import DirectionLight from "../lights/DirectionLight";
 /**
  * Created by yaozh on 2017/6/6.
  */

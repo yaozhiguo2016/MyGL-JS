@@ -1,4 +1,4 @@
-/// <reference path="../typings/dts/global.d.ts" />
+/// <reference path="../typings/index.d.ts" />
 /**
  * Created by yaozh on 2017/12/18.
  */
