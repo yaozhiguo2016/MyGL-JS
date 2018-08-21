@@ -118,9 +118,9 @@ export default class StandardMaterial extends Material
         this._type = 'StandardMaterial';
 
         this._emissiveColor = new Vector3(0.2, 0.2, 0.2);
-        this._ambientColor = new Vector3(0.1, 0.1, 0.1);
+        this._ambientColor = new Vector3(0.3, 0.3, 0.3);
         this._diffuseColor = new Vector3(0.6, 0.6, 0.6);
-        this._specularColor = new Vector3(0.3, 0.3, 0.3);
+        this._specularColor = new Vector3(0.6, 0.6, 0.6);
         this._shininess = 100.0;
         this._alpha = 1.0;
     }

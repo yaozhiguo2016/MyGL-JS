@@ -44,7 +44,7 @@ Main.prototype.loadComplete = function(event){
     this.engine.setRenderLoop(this.loop, this);
 
     this.scene = new MyGL.Scene3D();
-    //this.scene.ambientColor = new Vector3(0, 0,0);
+    this.scene.ambientColor = new MyGL.Vector3(1.0, 1.0, 1.0);
     //this.scene.initialize();
 
     //透视摄影机
@@ -54,7 +54,11 @@ Main.prototype.loadComplete = function(event){
     this.camera.lookAt(new MyGL.Vector3(0.0, 0.0, 0.0), MyGL.Vector3.UP);
     MyGL.MouseCameraHelper.attach(this.camera);
 
-    var cubeMat = new MyGL.StandardMaterial();
+    var cubeMat = new MyGL.StandardMaterial()
+    cubeMat.emissiveColor = new MyGL.Vector3(0.2, 0.2, 0.2);
+    cubeMat.ambientColor = new MyGL.Vector3(0.6, 0.6, 0.6);
+    cubeMat.diffuseColor = new MyGL.Vector3(0.6, 0.6, 0.6);
+    cubeMat.specularColor = new MyGL.Vector3(1.0, 1.0, 1.0);
     cubeMat.texture = new MyGL.Texture2D(MyGL.AssetsManager.getInstance().getAsset('img_crate'), true);
 
     //立方体
@@ -64,9 +68,10 @@ Main.prototype.loadComplete = function(event){
 
     var colorMaterial = new MyGL.StandardMaterial();
     colorMaterial.emissiveColor = new MyGL.Vector3(0.2, 0.2, 0.2);
-    colorMaterial.diffuseColor = new MyGL.Vector3(0.2, 0.2, 0.2);
-    colorMaterial.specularColor = new MyGL.Vector3(0.5, 0.5, 0.5);
-    colorMaterial.shininess = 50;
+    colorMaterial.ambientColor = new MyGL.Vector3(0.6, 0.6, 0.6);
+    colorMaterial.diffuseColor = new MyGL.Vector3(0.6, 0.6, 0.6);
+    colorMaterial.specularColor = new MyGL.Vector3(1.0, 1.0, 1.0);
+    colorMaterial.shininess = 100;
     colorMaterial.texture = new MyGL.Texture2D(MyGL.AssetsManager.getInstance().getAsset('img_earth'), true);
 
     //地球
@@ -84,20 +89,20 @@ Main.prototype.loadComplete = function(event){
 
     //平行光源
     this.directionLight = new MyGL.DirectionLight();
-    this.directionLight.color = new MyGL.Vector3(0.4, 0.0, 0.0);
+    this.directionLight.color = new MyGL.Vector3(1.0, 1.0, 1.0);
     this.directionLight.position = new MyGL.Vector3(0, 0, 1);
     this.scene.addLight(this.directionLight);
 
     //点光源
     this.pointLight = new MyGL.PointLight();
     this.scene.addLight(this.pointLight);
-    this.pointLight.color = new MyGL.Vector3(0.6, 0.6, 0.6);
+    this.pointLight.color = new MyGL.Vector3(0.8, 0.5, 0.5);
     this.pointLight.intensity = new MyGL.Vector3(1.0, 1.0, 1.0);
     this.pointLight.position.x = 5;
     this.pointLight.position.z = 5;
 
     var sm2 = new MyGL.StandardMaterial();
-    sm2.emissiveColor = new MyGL.Vector3(0.6, 0.6, 0.6);
+    sm2.emissiveColor = new MyGL.Vector3(0.6, 0.1, 0.1);
     //sm2.texture = new Texture2D();
     this.pointSphere = new MyGL.Mesh(new MyGL.Sphere(0.2, 16, 12), sm2);
     this.pointSphere.position.x = 5;
@@ -131,17 +136,21 @@ Main.prototype.loadComplete = function(event){
 
     var img = MyGL.AssetsManager.getInstance().getAsset('land');
     var terrainMat = new MyGL.StandardMaterial();
+    terrainMat.emissiveColor = new MyGL.Vector3(0.2, 0.2, 0.2);
+    terrainMat.ambientColor = new MyGL.Vector3(0.6, 0.6, 0.6);
+    terrainMat.diffuseColor = new MyGL.Vector3(0.6, 0.6, 0.6);
+    terrainMat.specularColor = new MyGL.Vector3(1.0, 1.0, 1.0);
     terrainMat.texture = new MyGL.Texture2D(MyGL.AssetsManager.getInstance().getAsset('grass'));
     this.terrain = new MyGL.Mesh(new MyGL.ColorHeightMap(img), terrainMat);
     this.terrain.position = new MyGL.Vector3(0, -20, 0);
     this.scene.addMesh(this.terrain);
 
     var droneMat = new MyGL.StandardMaterial();
-    droneMat.emissiveColor = new MyGL.Vector3(0.6, 0.6, 0.6);
+    droneMat.emissiveColor = new MyGL.Vector3(0.2, 0.2, 0.2);
     //droneMat.texture = new Texture2D(AssetsManager.getInstance().getAsset('drone_diffuse'));
     //加载Obj格式无人机模型
     var objparser = new MyGL.ObjParser(MyGL.AssetsManager.getInstance().getAsset('drone'));
-    this.drone = new MyGL.Mesh(new MyGL.ObjGeometry(objparser), droneMat);
+    this.drone = new MyGL.Mesh(new MyGL.ObjGeometry(objparser), terrainMat);
     this.drone.position = new MyGL.Vector3(-10, 8, 3);
     this.drone.rotation.x = 90;
     this.drone.scale = new MyGL.Vector3(0.005, 0.005,0.005);

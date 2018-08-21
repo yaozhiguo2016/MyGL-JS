@@ -53,7 +53,8 @@ varying vec2 v_TexCood;
 
 vec3 lighting(vec3 fragCoodInView, vec3 viewDirection, vec3 normal)
 {
-    vec3 color = vec3(texture2D(u_sampler2d, v_TexCood)) + materialAmbient * globalAmbient;//环境光反射
+    vec3 textureColor = vec3(texture2D(u_sampler2d, v_TexCood));
+    vec3 color = textureColor * materialAmbient * globalAmbient;//环境光反射
 
     for (int i = 0; i < 2; i++)
     {
@@ -62,7 +63,7 @@ vec3 lighting(vec3 fragCoodInView, vec3 viewDirection, vec3 normal)
         //光源关闭
         if (!light.enabled) continue;
 
-        color += materialAmbient * light.color;
+        //color += textureColor * materialAmbient * light.color;
         vec3 lightDirection;
         if (light.position.w == 0.0)//平行光源
         {
@@ -76,7 +77,7 @@ vec3 lighting(vec3 fragCoodInView, vec3 viewDirection, vec3 normal)
 
         if (angle <= 0.0)continue;
         //漫反射分量
-        color += angle * (light.intensity * materialDiffuse) * light.color;
+        color += textureColor * angle * (light.intensity * materialDiffuse) * light.color;
 
         //镜面反射方向
         vec3 reflectDirection = (2.0 * angle) * normal - lightDirection;

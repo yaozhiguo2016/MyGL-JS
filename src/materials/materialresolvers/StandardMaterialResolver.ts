@@ -116,6 +116,8 @@ export default class StandardMaterialResolver extends MaterialResolver
         mesh.normalMatrix.getInverse(mesh.worldMatrix, true);
         mesh.normalMatrix.transpose();
 
+        //mesh.normalMatrix.fromArray(mesh.worldMatrix.elements);
+
         let q:Quaternion = new Quaternion();
         camera.inverseWorldMatrix.decompose(new Vector3, q, new Vector3);
         let qm:Matrix4 = new Matrix4();
