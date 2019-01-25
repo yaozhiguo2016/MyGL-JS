@@ -11,7 +11,11 @@ export default class Driver implements ITick{
     private _fps:number = 60;
     private _name:string = '';
     private _frameElapse:number = 1000 / 60;
-    private _lastRenderTime = 0;
+    //private _lastRenderTime = 0;
+
+    private _now:number = 0; // 即将执行当前帧是的时间
+    private _lastTime:number = 0; // 执行上一帧时的时间
+    private _accumulatedBumpTime:number = 0; //前后帧真实的时间差和理想的时间差之间的误差，用于积累补偿
 
     public constructor(name:string = 'defaultDriver', fps:number = 60) {
         this._fps = fps;
@@ -21,7 +25,7 @@ export default class Driver implements ITick{
 
     public start():void {
         this._pause = false;
-        this._lastRenderTime = Date.now();
+        //this._lastRenderTime = Date.now();
     }
 
     public stop():void {
@@ -53,24 +57,18 @@ export default class Driver implements ITick{
         }
     }
 
-    public update():void {
+    public update(time?:number):void {
         if (this._pause) return;
-        for (let tick of this._tickList) {
-            tick.update();
-        }
-
-        /*let now = Date.now();
-        let elapse:number = now - this._lastRenderTime;
-        //console.log('ooooooooooooo', elapse);
-        if (elapse < this._frameElapse) {
-            return;
-        }
-        this._lastRenderTime = now;
-        let elapseCount = Math.floor(elapse / this._frameElapse);
-        for (let i:number = 0; i < elapseCount; i++) {
+    
+        this._now = time;
+        let elapsed:number = this._now - this._lastTime;
+        let offset = elapsed + this._accumulatedBumpTime - this._frameElapse;
+        if (offset >= 0) {
+            this._lastTime = this._now;
+            this._accumulatedBumpTime = offset;
             for (let tick of this._tickList) {
                 tick.update();
             }
-        }*/
+        }
     }
 }

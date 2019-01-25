@@ -1,3 +1,3 @@
 export interface ITick {
-    update():void;
+    update(time?:number):void;
 }

@@ -19,7 +19,10 @@ export default class DriverManager {
     }
 
     public static removeDriver(name:string):void {
-        delete this._drivers[name];
+        if (this._drivers[name]) {
+            this._drivers[name].stop();
+            delete this._drivers[name];
+        } 
     }
 
     public static getDriver(name:string):Driver {
@@ -53,7 +56,7 @@ export default class DriverManager {
         for (let key in this._drivers) {
             let driver:Driver = this._drivers[key];
             if (driver.pause) continue;
-            driver.update();
+            driver.update(performance.now());
         }
     }
 }

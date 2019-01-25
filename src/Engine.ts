@@ -5,11 +5,19 @@ import DriverManager from "./driver/DriverManager";
 /**
  * Created by yaozh on 2017/6/6.
  */
+
+declare class Stats {
+    showPanel(type:number);
+    begin();
+    end();
+    dom:HTMLElement;
+}
+
 export default class Engine
 {
     private _scene:Scene3D;
     private _context:WebGLRenderingContext;
-    private _loopExecutor:Object;
+    private _loopExecutor:{loopFunc:Function, context:any};
     private stats:Stats;
 
 
@@ -47,7 +55,7 @@ export default class Engine
     public update():void{
         this.stats.begin();
         if (this._loopExecutor){
-            this._loopExecutor['loopFunc'].call(this._loopExecutor['context']);
+            this._loopExecutor.loopFunc.call(this._loopExecutor.context);
         }
         this.stats.end();
     }
