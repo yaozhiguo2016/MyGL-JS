@@ -142,6 +142,6 @@ export default class ColorHeightMap extends Geometry
         }
 
         this._vertexUVs = new Float32Array(uv);
-        this.vertexCount = vertices.length / 3;
+        this._vertexNum = vertices.length / 3;
     }
 }

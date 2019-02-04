@@ -1,4 +1,3 @@
-/// <reference path="../typings/index.d.ts" />
 /**
  * Created by yaozh on 2017/12/18.
  */
@@ -13,7 +12,7 @@ import Mesh from './core/Mesh';
 import Object3D from './core/Object3D';
 import Scene3D from './core/Scene3D';
 import SkyBox from './core/SkyBox';
-import LoadProgressEvent from './Events/LoadProgressEvent';
+import LoadProgressEvent from './events/LoaderProgressEvent';
 import DirectionLight from './lights/DirectionLight';
 import HemisphereLight from './lights/HemisphereLight';
 import Light from './lights/Light';
@@ -49,15 +48,14 @@ import Geometry from "./primitives/Geometry";
 import Plane from "./primitives/Plane";
 import Sphere from "./primitives/Sphere";
 import Teapot from "./primitives/Teapot";
-import GLProgramLib from "./utils/GLProgramLib";
 import Texture from "./textures/Texture";
 import Texture2D from "./textures/Texture2D";
 import TextureCube from "./textures/TextureCube";
 import TextureVideo from "./textures/TextureVideo";
 import MouseCameraHelper from "./utils/MouseCameraHelper";
 import ShaderUtil from "./utils/ShaderUtil";
-import UniformUtil from "./utils/UniformUtil";
-import ShaderLib from './utils/ShaderLib';
+import UniformUtil from "./utils/ShaderHelper";
+import ShaderLib from './utils/ShaderSourceLib';
 
 let MyGL = {
     Engine,
@@ -106,7 +104,6 @@ let MyGL = {
     Plane,
     Sphere,
     Teapot,
-    GLProgramLib,
     Texture,
     Texture2D,
     TextureCube,

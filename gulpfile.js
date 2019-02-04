@@ -74,10 +74,10 @@ gulp.task('html', function(){
         .pipe(gulp.dest(dest))
 });
 
-gulp.task('glsl', function () {
-    console.log('glsl');
-    return gulp.src('./src/shaders/**/*.glsl').pipe(glsl()).pipe(gulp.dest(dest + '/shader'));
-});
+//gulp.task('glsl', function () {
+//    console.log('glsl');
+//    return gulp.src('./src/shaders/**/*.glsl').pipe(glsl()).pipe(gulp.dest(dest + '/shader'));
+//});
 
 gulp.task('dist', ['html', 'css', 'glsl','scripts']);
 

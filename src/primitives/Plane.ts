@@ -47,5 +47,7 @@ export default class Plane extends Geometry
         this._indices = new Uint16Array([
             0, 1, 2, 0, 2, 3
         ]);
+
+        this._vertexNum = 4;
     }
 }

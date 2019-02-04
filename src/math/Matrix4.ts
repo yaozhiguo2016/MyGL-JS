@@ -26,6 +26,11 @@ export default class Matrix4
         ]);
     }
 
+    /**
+     * 设置矩阵的元素。WebGL采用列向量，所以第一列是[n11, n21, n31, n41], 依次类推；数组存储也按照此顺序
+     * @param n11 n{row}{col}
+     * @param ... 
+     */
     public set(n11, n12, n13, n14, n21, n22, n23, n24, n31, n32, n33, n34, n41, n42, n43, n44):Matrix4
     {
         let te = this.elements;
@@ -37,6 +42,9 @@ export default class Matrix4
         return this;
     }
 
+    /**
+     * 把当前矩阵设置为单位矩阵
+     */
     public identity ():Matrix4
     {
         this.set(
@@ -67,6 +75,10 @@ export default class Matrix4
         return this;
     }
 
+    /**
+     * 从目标矩阵中提取出位置信息，并赋给当前矩阵
+     * @param m 
+     */
     public copyPosition ( m:Matrix4 ):Matrix4
     {
         let te = this.elements, me = m.elements;
@@ -78,6 +90,12 @@ export default class Matrix4
         return this;
     }
 
+    /**
+     * 提取除平移外的基础信息(转换矩阵坐标系的基向量)，并存储于传入的三个向量参数
+     * @param xAxis x基向量
+     * @param yAxis y基向量
+     * @param zAxis z基向量
+     */
     public extractBasis ( xAxis:Vector3, yAxis:Vector3, zAxis:Vector3 ):Matrix4
     {
         xAxis.setFromMatrixColumn( this, 0 );
@@ -87,6 +105,12 @@ export default class Matrix4
         return this;
     }
 
+    /**
+     * 根据传入的三个向量参数，设置除平移外的基础信息
+     * @param xAxis x基向量
+     * @param yAxis y基向量
+     * @param zAxis z基向量
+     */
     public makeBasis ( xAxis:Vector3, yAxis:Vector3, zAxis:Vector3 ) :Matrix4
     {
         this.set(
@@ -99,6 +123,10 @@ export default class Matrix4
         return this;
     }
 
+    /**
+     * 从给定的矩阵中提取旋转信息，并保存于当前矩阵中。
+     * @param m 
+     */
     public extractRotation (m:Matrix3|Matrix4):Matrix4
     {
         let v1:Vector3 = new Vector3();
@@ -124,6 +152,10 @@ export default class Matrix4
         return this;
     }
 
+    /**
+     * 从欧拉角中提取旋转信息，并保存于当前矩阵中。
+     * @param euler 
+     */
     public makeRotationFromEuler ( euler:EulerAngle ):Matrix4
     {
         let te:Float32Array = this.elements;
@@ -245,6 +277,10 @@ export default class Matrix4
         return this;
     }
 
+    /**
+     * 从四元数中提取旋转信息，并保存于当前矩阵中。
+     * @param euler 
+     */
     public makeRotationFromQuaternion ( q:Quaternion ):Matrix4
     {
         let te:Float32Array = this.elements;
@@ -281,7 +317,12 @@ export default class Matrix4
         return this;
     }
 
-    //public makeLookAt(eyeX, eyeY, eyeZ, centerX, centerY, centerZ, upX, upY, upZ):Matrix4
+    /**
+     * 把当前矩阵设置为一个lookAt 形式的矩阵
+     * @param eye 
+     * @param target 
+     * @param up 
+     */
     public makeLookAt(eye:Vector3, target:Vector3, up:Vector3):Matrix4
     {
         let eyeX = eye.elements[0];
@@ -326,32 +367,22 @@ export default class Matrix4
 
         // Set to this.
         e = this.elements;
-        e[0] = sx;
-        e[1] = ux;
-        e[2] = -fx;
-        e[3] = 0;
-
-        e[4] = sy;
-        e[5] = uy;
-        e[6] = -fy;
-        e[7] = 0;
-
-        e[8] = sz;
-        e[9] = uz;
-        e[10] = -fz;
-        e[11] = 0;
-
-        e[12] = 0;
-        e[13] = 0;
-        e[14] = 0;
-        e[15] = 1;
+        e[0] = sx;   e[4] = sy;    e[8] = sz;    e[12] = 0;
+        e[1] = ux;   e[5] = uy;    e[9] = uz;    e[13] = 0;
+        e[2] = -fx;  e[6] = -fy;   e[10] = -fz;  e[14] = 0;
+        e[3] = 0;    e[7] = 0;     e[11] = 0;    e[15] = 1;
 
         // Translate.
         let translation:Matrix4 = new Matrix4().makeTranslation(-eyeX, -eyeY, -eyeZ);
         return this.multiply(translation);
-        //return this.translate(-eyeX, -eyeY, -eyeZ);
     }
 
+    /**
+     * 将当前矩阵与一个lookAt相乘，结果保存在当前矩阵中
+     * @param eye 
+     * @param target 
+     * @param up 
+     */
     public lookAt (eye:Vector3, target:Vector3, up:Vector3):Matrix4
     {
         let x = new Vector3();
@@ -401,6 +432,11 @@ export default class Matrix4
         return this.multiplyMatrices( m, this );
     }
 
+    /**
+     * 两个矩阵相乘，并把结果存储于当前矩阵中。
+     * @param a 
+     * @param b 
+     */
     public multiplyMatrices ( a:Matrix4, b:Matrix4 ):Matrix4
     {
         let ae:Float32Array = a.elements;
@@ -470,6 +506,9 @@ export default class Matrix4
         return attribute;
     }
 
+    /**
+     * 求当前矩阵的行列式
+     */
     public determinant():number
     {
         let te:Float32Array = this.elements;
@@ -519,6 +558,9 @@ export default class Matrix4
         );
     }
 
+    /**
+     * 转置当前矩阵
+     */
     public transpose ():Matrix4
     {
         let te:Float32Array = this.elements;
@@ -535,6 +577,10 @@ export default class Matrix4
         return this;
     }
 
+    /**
+     * 向当前矩阵中注入位置信息
+     * @param v 
+     */
     public setPosition ( v:Vector3 ):Matrix4
     {
         let te:Float32Array= this.elements;
@@ -545,6 +591,11 @@ export default class Matrix4
         return this;
     }
 
+    /**
+     * 转换当前矩阵为它的逆矩阵。当行列式为0时，它是投影矩阵，没有逆矩阵，会抛出错误。
+     * @param m 
+     * @param throwOnDegenerate 
+     */
     public getInverse( m:Matrix4, throwOnDegenerate:boolean ):Matrix4
     {
         // based on http://www.euclideanspace.com/maths/algebra/matrix/functions/inverse/fourD/index.htm
@@ -565,7 +616,7 @@ export default class Matrix4
 
         if ( det === 0 ) {
 
-            let msg = "THREE.Matrix4.getInverse(): can't invert matrix, determinant is 0";
+            let msg = "Matrix4.getInverse(): can't invert matrix, determinant is 0";
 
             if ( throwOnDegenerate === true ) {
 
@@ -920,6 +971,10 @@ export default class Matrix4
         return this;
     }
 
+    /**
+     * 判断两个矩阵内的元素是否全部相同
+     * @param matrix 
+     */
     public equals ( matrix:Matrix4 ):boolean
     {
         let te = this.elements;

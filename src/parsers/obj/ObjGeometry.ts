@@ -13,6 +13,6 @@ export default class ObjGeometry extends Geometry
         this._vertexPositions = new Float32Array(parser.vertices);
         this._vertexNormals = new Float32Array(parser.normals);
         this._vertexUVs = new Float32Array(parser.textures);
-        this.vertexCount = parser.vertexCount;
+        this._vertexNum = parser.vertexCount;
     }
 }

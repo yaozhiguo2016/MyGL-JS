@@ -47,6 +47,10 @@ export default class Vector3
         return this;
     }
 
+    /**
+     * 把本向量的每个分量设置为某个相同的数值
+     * @param scalar 
+     */
     public setScalar ( scalar:number ) :Vector3
     {
         this.x = scalar;
@@ -74,6 +78,11 @@ export default class Vector3
         return this;
     }
 
+    /**
+     * 设置本向量某个分量的值
+     * @param index 分量索引，从0开始 
+     * @param value 欲设置的分量的值
+     */
     public setComponent( index:number, value:number ):Vector3
     {
         switch ( index )
@@ -97,11 +106,18 @@ export default class Vector3
         }
     }
 
+    /**
+     * 获取当前向量的副本），不影响当前向量
+     */
     public clone ():Vector3
     {
         return new Vector3( this.x, this.y, this.z );
     }
 
+    /**
+     * 用某个向量为当前向量赋值(分量分别赋值，不影响参数向量)
+     * @param v 
+     */
     public copyFrom ( v:Vector3 ):Vector3
     {
         this.x = v.x;
@@ -120,6 +136,10 @@ export default class Vector3
         return this;
     }
 
+    /**
+     * 为当前向量的每个分量都增加一个相同标量数
+     * @param s 
+     */
     public addScalar( s:number ):Vector3
     {
         this.x += s;
@@ -129,6 +149,11 @@ export default class Vector3
         return this;
     }
 
+    /**
+     * 同时把两个向量与当前向量相加：相当于a,b先相加，然后把结果与当前向量相加
+     * @param a 
+     * @param b 
+     */
     public addVectors ( a:Vector3, b:Vector3 ):Vector3
     {
         this.x = a.x + b.x;
@@ -137,6 +162,11 @@ export default class Vector3
         return this;
     }
 
+    /**
+     * 将一个缩放的向量与当前向量相加
+     * @param v 将缩放的向量
+     * @param s 缩放倍数
+     */
     public addScaledVector ( v:Vector3, s:number ):Vector3
     {
         this.x += v.x * s;
@@ -155,6 +185,10 @@ export default class Vector3
         return this;
     }
 
+    /**
+     * 为当前向量的每个分量都减去一个相同标量数
+     * @param s 
+     */
     public subScalar( s:number ):Vector3
     {
         this.x -= s;
@@ -164,6 +198,11 @@ export default class Vector3
         return this;
     }
 
+    /**
+     * 求两个向量的差，并保存在当前向量中
+     * @param a 
+     * @param b 
+     */
     public subVectors (a:Vector3, b:Vector3):Vector3
     {
         this.x = a.x - b.x;
@@ -182,6 +221,10 @@ export default class Vector3
         return this;
     }
 
+    /**
+     * 将当前向量的每个分量都乘以一个相同标量数
+     * @param s 
+     */
     public multiplyScalar ( scalar:number ):Vector3
     {
         this.x *= scalar;
@@ -286,7 +329,7 @@ export default class Vector3
 
     public transformDirection ( m:Matrix3|Matrix4 ):Vector3
     {
-        // input: THREE.Matrix4 affine matrix
+        // input: Matrix4 affine matrix
         // vector interpreted as a direction
 
         let x = this.x, y = this.y, z = this.z;
@@ -308,6 +351,10 @@ export default class Vector3
         return this;
     }
 
+    /**
+     * 将当前向量的每个分量都除以一个相同标量数
+     * @param s 
+     */
     public divideScalar ( scalar:number ):Vector3
     {
         return this.multiplyScalar( 1 / scalar );
@@ -403,6 +450,10 @@ export default class Vector3
         return this;
     }
 
+    /**
+     * 点乘，结果是一个标量，衡量两个向量的相似度
+     * @param v 
+     */
     public dot ( v:Vector3 ):number
     {
         return this.x * v.x + this.y * v.y + this.z * v.z;
@@ -425,6 +476,9 @@ export default class Vector3
         return Math.abs( this.x ) + Math.abs( this.y ) + Math.abs( this.z );
     }
 
+    /**
+     * 向量归一化，变为单位向量
+     */
     public normalize ():Vector3
     {
         return this.divideScalar( this.length() );
@@ -435,6 +489,11 @@ export default class Vector3
         return this.multiplyScalar( length / this.length() );
     }
 
+    /**
+     * 线性插值
+     * @param v 目标向量 
+     * @param alpha 目标向量和当前向量之间的递进度，小于1
+     */
     public lerp ( v:Vector3, alpha:number ):Vector3
     {
         this.x += ( v.x - this.x ) * alpha;
@@ -449,6 +508,10 @@ export default class Vector3
         return this.subVectors( v2, v1 ).multiplyScalar( alpha ).add( v1 );
     }
 
+    /**
+     * 向量叉乘，获取与目标向量和当前向量所确定平面垂直的向量，新向量的方向满足右手定则
+     * @param v 
+     */
     public cross ( v:Vector3):Vector3
     {
         let x = this.x, y = this.y, z = this.z;
@@ -460,6 +523,11 @@ export default class Vector3
         return this;
     }
 
+    /**
+     * 把两个向量叉乘的结果，存储于当前向量中。
+     * @param a 
+     * @param b 
+     */
     public crossVectors ( a:Vector3, b:Vector3 ):Vector3
     {
         let ax = a.x, ay = a.y, az = a.z;
@@ -485,6 +553,10 @@ export default class Vector3
         return this.sub( v1 );
     }
 
+    /**
+     * 当前向量基于某法线的对称向量
+     * @param normal 
+     */
     public reflect (normal:Vector3):Vector3
     {
         // reflect incident vector off plane orthogonal to normal
@@ -493,6 +565,10 @@ export default class Vector3
         return this.sub( v1.copyFrom( normal ).multiplyScalar( 2 * this.dot( normal ) ) );
     }
 
+    /**
+     * 相对于目标向量的夹角
+     * @param v 
+     */
     public angleTo ( v:Vector3 ):number
     {
         let theta = this.dot( v ) / ( Math.sqrt( this.lengthSq() * v.lengthSq() ) );
@@ -536,16 +612,30 @@ export default class Vector3
         return this;
     }
 
+    /**
+     * 从矩阵的某列获取数值，重置当前向量的分量
+     * @param m 
+     * @param index 
+     */
     public setFromMatrixColumn ( m:Matrix3|Matrix4, index )
     {
         return this.fromArray( m.elements, index * 4 );
     }
 
+    /**
+     * 判断两个向量的每个分量是否完全一致
+     * @param v 
+     */
     public equals ( v:Vector3 ):boolean
     {
         return ( ( v.x === this.x ) && ( v.y === this.y ) && ( v.z === this.z ) );
     }
 
+    /**
+     * 从数组的某个位置开始依次对当前向量的每个分量赋值
+     * @param array 来源数组
+     * @param offset 数组中对应的第一个分量的位置
+     */
     public fromArray ( array:Array<number>|Float32Array, offset:number = 0 ):Vector3
     {
         this.x = array[ offset ];
@@ -555,6 +645,11 @@ export default class Vector3
         return this;
     }
 
+    /**
+     * 将当前向量的分量按序传给既定数组的特定索引位置
+     * @param array 
+     * @param offset 
+     */
     public toArray ( array?:Array<any>, offset:number=0 ):Array<number>
     {
         if ( array === undefined ) array = [];
@@ -570,9 +665,7 @@ export default class Vector3
     public fromBufferAttribute ( attribute, index:number, offset:number=0 ):Vector3
     {
         if ( offset !== undefined ) {
-
-            console.warn( 'THREE.Vector3: offset has been removed from .fromBufferAttribute().' );
-
+            console.warn( 'Vector3: offset has been removed from .fromBufferAttribute().' );
         }
 
         this.x = attribute.getX( index );

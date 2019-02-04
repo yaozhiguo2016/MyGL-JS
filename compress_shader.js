@@ -23,6 +23,6 @@ function compress(path, fileName) {
 }
 
 module.exports = function () {
-    compress('./src/shaders/');
-    fs.writeFileSync('./src/utils/ShaderLib.ts', 'export default ' + JSON.stringify(files));
+    compress('./src/shader_src/');
+    fs.writeFileSync('./src/utils/ShaderSourceLib.ts', 'export default ' + JSON.stringify(files));
 };

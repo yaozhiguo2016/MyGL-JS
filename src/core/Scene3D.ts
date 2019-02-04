@@ -70,14 +70,24 @@ export default class Scene3D
         gl.enable(gl.DEPTH_TEST);
         // Clear color and depth buffer
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-        gl.enable(gl.CULL_FACE);
-        gl.cullFace(gl.BACK);
         // Draw the cube
-
         for (let mesh of this._meshes)
         {
             if (!mesh.visible)continue;
+            this.setGLState(gl, mesh);
             mesh.draw();
         }
+    }
+
+    private setGLState(gl:WebGLRenderingContext, mesh:Mesh):void {
+      if (mesh.surfaceSide == Mesh.SURFACE_SIDE_FRONT) {
+        gl.enable(gl.CULL_FACE);
+        gl.cullFace(gl.BACK);
+      } else if (mesh.surfaceSide == Mesh.SURFACE_SIDE_BACK) {
+        gl.enable(gl.CULL_FACE);
+        gl.cullFace(gl.FRONT);
+      } else {
+        gl.disable(gl.CULL_FACE);
+      }
     }
 }

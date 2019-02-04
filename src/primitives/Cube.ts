@@ -72,5 +72,7 @@ export default class Cube extends Geometry
             16,17,18,  16,18,19,    // down
             20,21,22,  20,22,23     // back
         ]);
+
+        this._vertexNum = 8;
     }
 }

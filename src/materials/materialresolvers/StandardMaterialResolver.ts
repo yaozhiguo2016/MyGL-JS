@@ -2,19 +2,18 @@ import MaterialResolver from "./MaterialResolver";
 import Mesh from "../../core/Mesh";
 import RenderContext from "../../RenderContext";
 import Geometry from "../../primitives/Geometry";
-import GLProgramLib from "../../utils/GLProgramLib";
 import ShaderUtil from "../../utils/ShaderUtil";
 import AssetsManager from "../../managers/AssetsManager";
 import Vector3 from "../../math/Vector3";
 import StandardMaterial from "../StandardMaterial";
 import Camera from "../../cameras/Camera";
-import UniformUtil from "../../utils/UniformUtil";
+import UniformUtil from "../../utils/ShaderHelper";
 import Vector4 from "../../math/Vector4";
 import Quaternion from "../../math/Quaternion";
 import Matrix4 from "../../math/Matrix4";
 import Scene3D from "../../core/Scene3D";
 import Light from "../../lights/Light";
-import ShaderLib from '../../utils/ShaderLib';
+import ShaderLib from '../../utils/ShaderSourceLib';
 /**
  * Created by yaozh on 2017/6/28.
  */
@@ -27,7 +26,7 @@ export default class StandardMaterialResolver extends MaterialResolver
 
     public initMeshData():void
     {
-        let gl:WebGLRenderingContext = RenderContext.context;
+        /*let gl:WebGLRenderingContext = RenderContext.context;
         let mesh:Mesh = this._mesh;
         let geometry:Geometry = mesh.geometry;
 
@@ -63,10 +62,10 @@ export default class StandardMaterialResolver extends MaterialResolver
             mesh.a_UV = gl.getAttribLocation(glProgram, 'a_TexCood');
             mesh.uvBuffer = mesh.createArrayBuffer(geometry.uvs);
         }
-        if (mesh.geometry.indexDraw)mesh.indexBuffer = mesh.createIndexBuffer();
+        if (mesh.geometry.indexDraw)mesh.indexBuffer = mesh.createIndexBuffer();*/
     }
 
-    public resetAttribsAndUniforms():void
+    /*public resetAttribsAndUniforms():void
     {
         let mesh:Mesh = this._mesh;
         RenderContext.context.useProgram(mesh.usedProgram);
@@ -79,7 +78,7 @@ export default class StandardMaterialResolver extends MaterialResolver
 
     private setGLStates(mesh:Mesh):void
     {
-        UniformUtil.setProgrom(mesh.usedProgram);
+        UniformUtil.reset(mesh.usedProgram);
         let gl:WebGLRenderingContext = RenderContext.context;
         if (mesh.surfaceSide == Mesh.SURFACE_SIDE_FRONT)
         {
@@ -100,7 +99,7 @@ export default class StandardMaterialResolver extends MaterialResolver
 
     private handleMVP(mesh:Mesh):void
     {
-        UniformUtil.setProgrom(mesh.usedProgram);
+        UniformUtil.reset(mesh.usedProgram);
 
         let camera:Camera = mesh.scene.currentCamera;
 
@@ -128,7 +127,7 @@ export default class StandardMaterialResolver extends MaterialResolver
 
     private handleLights(mesh:Mesh):void
     {
-        UniformUtil.setProgrom(mesh.usedProgram);
+        UniformUtil.reset(mesh.usedProgram);
         //全局环境光
         let globalAmbient:Vector3 = mesh.scene.ambientColor;
         UniformUtil.assign3f('globalAmbient', globalAmbient.x, globalAmbient.y, globalAmbient.z);
@@ -170,7 +169,7 @@ export default class StandardMaterialResolver extends MaterialResolver
     {
         let colorMat:StandardMaterial = <StandardMaterial>(this._material);
 
-        UniformUtil.setProgrom(mesh.usedProgram);
+        UniformUtil.reset(mesh.usedProgram);
 
 
         let am:Vector3 = colorMat.ambientColor;
@@ -210,5 +209,5 @@ export default class StandardMaterialResolver extends MaterialResolver
             //console.log(this._material.texture, this._mesh.geometry);
         }
         if (mesh.geometry.indexDraw)gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, mesh.indexBuffer);
-    }
+    }*/
 }
