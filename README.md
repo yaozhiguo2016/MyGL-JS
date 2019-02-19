@@ -107,7 +107,7 @@ Main.prototype.loadComplete = function(event){
     this.plane.surfaceSide = MyGL.Mesh.SURFACE_SIDE_DOUBLE;
 
     //平行光源
-    this.directionLight = new MyGL.DirectionLight();
+    this.directionLight = new MyGL.DirectionalLight();
     this.directionLight.color = new MyGL.Vector3(0.4, 0.0, 0.0);
     this.directionLight.position = new MyGL.Vector3(0, 0, 1);
     this.scene.addLight(this.directionLight);

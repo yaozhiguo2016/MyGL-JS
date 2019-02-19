@@ -12,11 +12,15 @@ varying vec3 v_FragNormal;
 attribute vec2 a_TexCood;
 varying vec2 v_TexCood;
 
+uniform bool u_HasTexture;
+
 void main()
 {
     vec4 modelViewCood = u_mvMatrix * a_Position;
     gl_Position = u_ProjMatrix * modelViewCood;
     v_FragNormal = (u_NormalMatrix * a_Normal).xyz;
     v_ViewFragCood = modelViewCood.xyz;
-    v_TexCood = a_TexCood;
+    if (u_HasTexture) {
+        v_TexCood = a_TexCood;
+    }
 }

@@ -13,8 +13,7 @@ import Object3D from './core/Object3D';
 import Scene3D from './core/Scene3D';
 import SkyBox from './core/SkyBox';
 import LoadProgressEvent from './events/LoaderProgressEvent';
-import DirectionLight from './lights/DirectionLight';
-import HemisphereLight from './lights/HemisphereLight';
+import DirectionalLight from './lights/DirectionalLight';
 import Light from './lights/Light';
 import PointLight from './lights/PointLight';
 import SpotLight from './lights/SpotLight';
@@ -70,8 +69,7 @@ let MyGL = {
     Scene3D,
     SkyBox,
     LoadProgressEvent,
-    DirectionLight,
-    HemisphereLight,
+    DirectionalLight,
     Light,
     PointLight,
     SpotLight,

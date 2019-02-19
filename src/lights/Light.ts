@@ -12,7 +12,7 @@ export default class Light extends Object3D
     /**
      * 光的强度，在0-1之间
      */
-    protected _intensity:Vector3; //range 0-1
+    protected _intensity:number; //range 0-1
     /**
      * 标识本光源是否可用
      */
@@ -28,12 +28,12 @@ export default class Light extends Object3D
         this._color = value;
     }
 
-    public get intensity():Vector3
+    public get intensity():number
     {
         return this._intensity;
     }
 
-    public set intensity(value:Vector3)
+    public set intensity(value:number)
     {
         this._intensity = value;
     }
@@ -48,11 +48,11 @@ export default class Light extends Object3D
         this._enabled = value;
     }
 
-    public constructor(color?:Vector3, intensity?:Vector3)
+    public constructor(color?:Vector3, intensity?:number)
     {
         super();
-        this._color = color || new Vector3(1.0,1.0,1.0);
-        this._intensity = intensity || new Vector3(1, 1, 1);
+        this._color = color || new Vector3(1.0, 1.0, 1.0);
+        this._intensity = intensity || 1.0;
         this._enabled = true;
 
         this._type = 'Light';

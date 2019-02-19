@@ -1,10 +1,9 @@
 import Material from "./Material";
 import Vector3 from "../math/Vector3";
 import Texture from "../textures/Texture";
-import PhongTextureShader from "../shaders/PhongTextureShader";
-import PhongNoTextureShader from "../shaders/PhongNoTextureShader";
 import Shader from "../shaders/Shader";
-import ShaderLib from "../shaders/ShaderLib";
+import ShaderManager from "../shaders/ShaderManager";
+import StandardShader from "../shaders/StandardShader";
 
 /**
  * Created by yaozh on 2017/6/6.
@@ -106,7 +105,7 @@ export default class StandardMaterial extends Material {
     super();
     this._type = 'StandardMaterial';
 
-    this._emissiveColor = new Vector3(0.2, 0.2, 0.2);
+    this._emissiveColor = new Vector3(0.1, 0.1, 0.1);
     this._ambientColor = new Vector3(0.3, 0.3, 0.3);
     this._diffuseColor = new Vector3(0.6, 0.6, 0.6);
     this._specularColor = new Vector3(0.6, 0.6, 0.6);
@@ -115,11 +114,7 @@ export default class StandardMaterial extends Material {
   }
 
   public getShader(): Shader {
-    if (this.texture) {
-      this._shader = ShaderLib.createShader('phong', PhongTextureShader);
-    } else {
-      this._shader = ShaderLib.createShader('phong_no_texture', PhongNoTextureShader);
-    }
+    this._shader = ShaderManager.createShader('standard_phong', StandardShader);
     return this._shader;
   }
 }

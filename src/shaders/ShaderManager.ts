@@ -7,7 +7,7 @@ import Shader from "./Shader";
 import RenderContext from "../RenderContext";
 import ShaderUtil from "../utils/ShaderUtil";
 
-export default class ShaderLib {
+export default class ShaderManager {
   private static _shaders:Object = {};
 
   public static addShader(key:string, shader:Shader):void
@@ -29,7 +29,7 @@ export default class ShaderLib {
   }
 
   /**
-   * 创建并缓存Shader对象，以传入的key作为唯一识别符
+   * 创建并缓存Shader对象，以传入的key作为唯一识别符。如果缓存中已经存在key对应的Shader对象，则直接从缓存中返回该对象。
    * @param {string} key
    * @param ShaderCls
    * @param {string} vertSrc

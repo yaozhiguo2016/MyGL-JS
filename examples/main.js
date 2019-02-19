@@ -55,7 +55,7 @@ Main.prototype.loadComplete = function (event) {
   MyGL.MouseCameraHelper.attach(this.camera);
 
   var cubeMat = new MyGL.StandardMaterial();
-  cubeMat.emissiveColor = new MyGL.Vector3(0.2, 0.2, 0.2);
+  //cubeMat.emissiveColor = new MyGL.Vector3(0.2, 0.2, 0.2);
   cubeMat.ambientColor = new MyGL.Vector3(0.6, 0.6, 0.6);
   cubeMat.diffuseColor = new MyGL.Vector3(0.6, 0.6, 0.6);
   cubeMat.specularColor = new MyGL.Vector3(1.0, 1.0, 1.0);
@@ -67,11 +67,11 @@ Main.prototype.loadComplete = function (event) {
   this.scene.addMesh(this.cube);
 
   var colorMaterial = new MyGL.StandardMaterial();
-  colorMaterial.emissiveColor = new MyGL.Vector3(0.2, 0.2, 0.2);
+  //colorMaterial.emissiveColor = new MyGL.Vector3(0.2, 0.2, 0.2);
   colorMaterial.ambientColor = new MyGL.Vector3(0.6, 0.6, 0.6);
   colorMaterial.diffuseColor = new MyGL.Vector3(0.6, 0.6, 0.6);
   colorMaterial.specularColor = new MyGL.Vector3(1.0, 1.0, 1.0);
-  colorMaterial.shininess = 100;
+  colorMaterial.shininess = 300;
   colorMaterial.texture = new MyGL.Texture2D(MyGL.AssetsManager.getInstance().getAsset('img_earth'), true);
 
   //地球
@@ -88,7 +88,7 @@ Main.prototype.loadComplete = function (event) {
   this.plane.surfaceSide = MyGL.Mesh.SURFACE_SIDE_DOUBLE;
 
   //平行光源
-  this.directionLight = new MyGL.DirectionLight();
+  this.directionLight = new MyGL.DirectionalLight();
   this.directionLight.color = new MyGL.Vector3(1.0, 1.0, 1.0);
   this.directionLight.position = new MyGL.Vector3(0, 0, 1);
   this.scene.addLight(this.directionLight);
@@ -96,10 +96,16 @@ Main.prototype.loadComplete = function (event) {
   //点光源
   this.pointLight = new MyGL.PointLight();
   this.scene.addLight(this.pointLight);
-  this.pointLight.color = new MyGL.Vector3(0.8, 0.5, 0.5);
-  this.pointLight.intensity = new MyGL.Vector3(1.0, 1.0, 1.0);
+  this.pointLight.color = new MyGL.Vector3(1.0, 1.0, 1.0);
+  this.pointLight.intensity = 1.0;
   this.pointLight.position.x = 5;
   this.pointLight.position.z = 5;
+
+  // 聚光灯
+  this.spotLight = new MyGL.SpotLight(new MyGL.Vector3(6.0, -1.0, -1.0), Math.cos(Math.PI / 180));
+  this.spotLight.color = new MyGL.Vector3(1.0, 1.0, 1.0);
+  this.spotLight.position = new MyGL.Vector3(0, 25, 20);
+  this.scene.addLight(this.spotLight);
 
   var sm2 = new MyGL.StandardMaterial();
   sm2.emissiveColor = new MyGL.Vector3(0.6, 0.1, 0.1);
@@ -112,7 +118,7 @@ Main.prototype.loadComplete = function (event) {
   //茶壶
   var teapot = new MyGL.Teapot();
   var sm = new MyGL.StandardMaterial();
-  sm.emissiveColor = new MyGL.Vector3(0.2, 0.2, 0.0);
+  //sm.emissiveColor = new MyGL.Vector3(0.2, 0.2, 0.0);
   sm.texture = new MyGL.Texture2D();
   this.teapot = new MyGL.Mesh(teapot, sm);
   this.teapot.position.y = 4;
@@ -136,7 +142,7 @@ Main.prototype.loadComplete = function (event) {
 
   var img = MyGL.AssetsManager.getInstance().getAsset('land');
   var terrainMat = new MyGL.StandardMaterial();
-  terrainMat.emissiveColor = new MyGL.Vector3(0.2, 0.2, 0.2);
+  //terrainMat.emissiveColor = new MyGL.Vector3(0.2, 0.2, 0.2);
   terrainMat.ambientColor = new MyGL.Vector3(0.6, 0.6, 0.6);
   terrainMat.diffuseColor = new MyGL.Vector3(0.6, 0.6, 0.6);
   terrainMat.specularColor = new MyGL.Vector3(1.0, 1.0, 1.0);
@@ -146,7 +152,7 @@ Main.prototype.loadComplete = function (event) {
   this.scene.addMesh(this.terrain);
 
   var droneMat = new MyGL.StandardMaterial();
-  droneMat.emissiveColor = new MyGL.Vector3(0.2, 0.2, 0.2);
+  //droneMat.emissiveColor = new MyGL.Vector3(0.2, 0.2, 0.2);
   //droneMat.texture = new Texture2D(AssetsManager.getInstance().getAsset('drone_diffuse'));
   //加载Obj格式无人机模型
   var objparser = new MyGL.ObjParser(MyGL.AssetsManager.getInstance().getAsset('drone'));
