@@ -4,6 +4,7 @@ import Texture from "../textures/Texture";
 import Shader from "../shaders/Shader";
 import ShaderManager from "../shaders/ShaderManager";
 import StandardShader from "../shaders/StandardShader";
+import Constant from "../enum/Constant";
 
 /**
  * Created by yaozh on 2017/6/6.
@@ -20,6 +21,8 @@ export default class StandardMaterial extends Material {
   protected _renderMode: string = 'wireframe';
 
   protected _alpha: number;
+
+  protected _shadingType: string = Constant.PHONG_SHADING; // 着色方式
 
   /**
    * 物体本身的表面颜色，即自发的光线
@@ -101,6 +104,14 @@ export default class StandardMaterial extends Material {
     this._alpha = value;
   }
 
+  public get shadingType():string {
+    return this._shadingType;
+  }
+
+  public set shadingType(value: string) {
+    this._shadingType = value;
+  }
+
   public constructor() {
     super();
     this._type = 'StandardMaterial';
@@ -114,7 +125,7 @@ export default class StandardMaterial extends Material {
   }
 
   public getShader(): Shader {
-    this._shader = ShaderManager.createShader('standard_phong', StandardShader);
+    this._shader = ShaderManager.createShader(`standard_${this._shadingType}`, StandardShader);
     return this._shader;
   }
 }

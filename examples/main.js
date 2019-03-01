@@ -1,6 +1,8 @@
 /**
  * Created by yaozh on 2017/12/19.
  */
+//import MyGL from "../src/MyGL";
+
 function Main() {
 
   MyGL.AssetsManager.getInstance().addGroup([
@@ -72,7 +74,11 @@ Main.prototype.loadComplete = function (event) {
   colorMaterial.diffuseColor = new MyGL.Vector3(0.6, 0.6, 0.6);
   colorMaterial.specularColor = new MyGL.Vector3(1.0, 1.0, 1.0);
   colorMaterial.shininess = 300;
-  colorMaterial.texture = new MyGL.Texture2D(MyGL.AssetsManager.getInstance().getAsset('img_earth'), true);
+  var earthTexture = new MyGL.Texture2D(MyGL.AssetsManager.getInstance().getAsset('img_earth'), true);
+  earthTexture.useMipMap = false;
+  earthTexture.minFilter = MyGL.LINEAR;
+  earthTexture.magFilter = MyGL.NEAREST;
+  colorMaterial.texture = earthTexture;
 
   //地球
   this.sphere = new MyGL.Mesh(new MyGL.Sphere(3, 24, 24), colorMaterial);
