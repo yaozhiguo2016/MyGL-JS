@@ -1,9 +1,6 @@
 import Material from "./Material";
 import Vector3 from "../math/Vector3";
 import Texture from "../textures/Texture";
-import Shader from "../shaders/Shader";
-import ShaderManager from "../shaders/ShaderManager";
-import StandardShader from "../shaders/StandardShader";
 import Constant from "../enum/Constant";
 
 /**
@@ -122,10 +119,5 @@ export default class StandardMaterial extends Material {
     this._specularColor = new Vector3(0.6, 0.6, 0.6);
     this._shininess = 100.0;
     this._alpha = 1.0;
-  }
-
-  public getShader(): Shader {
-    this._shader = ShaderManager.createShader(`standard_${this._shadingType}`, StandardShader);
-    return this._shader;
   }
 }

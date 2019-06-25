@@ -12,7 +12,7 @@ export default class ShaderUtil
      */
     public static initShaders(gl:WebGLRenderingContext, vs:string, fs:string):boolean
     {
-        let program:WebGLProgram = ShaderUtil.createProgram(gl, vs, fs);
+        let program:WebGLProgram = this.createProgram(gl, vs, fs);
         if (!program)
         {
             console.log('Failed to create program');
@@ -33,8 +33,8 @@ export default class ShaderUtil
     public static createProgram(gl:WebGLRenderingContext, vshader:string, fshader:string):WebGLProgram
     {
         // Create shader object
-        let vertexShader:WebGLShader = ShaderUtil.createShader(gl, gl.VERTEX_SHADER, vshader);
-        let fragmentShader:WebGLShader = ShaderUtil.createShader(gl, gl.FRAGMENT_SHADER, fshader);
+        let vertexShader:WebGLShader = this.createShader(gl, gl.VERTEX_SHADER, vshader);
+        let fragmentShader:WebGLShader = this.createShader(gl, gl.FRAGMENT_SHADER, fshader);
         if (!vertexShader || !fragmentShader) {
             return null;
         }

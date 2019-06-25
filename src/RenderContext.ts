@@ -19,7 +19,7 @@ export default class RenderContext {
   }
 
   public static get isSupportWebGL(): boolean {
-    let canvas: HTMLCanvasElement = <HTMLCanvasElement>(document.getElementById('glContainer'));
+    let canvas: HTMLCanvasElement = document.createElement('canvas');
     let names: string[] = ["webgl2", "webgl", "experimental-webgl", "webkit-3d", "moz-webgl"];
     let context: WebGLRenderingContext = null;
     for (let i: number = 0; i < names.length; i++) {
@@ -34,8 +34,7 @@ export default class RenderContext {
     return false;
   }
 
-  public static createConext(antialias?: boolean): WebGLRenderingContext {
-    let canvas: HTMLCanvasElement = <HTMLCanvasElement>(document.getElementById('glContainer'));
+  public static createConext(canvas:HTMLCanvasElement, antialias?: boolean): WebGLRenderingContext {
     let names: string[] = ["webgl2", "webgl", "experimental-webgl", "webkit-3d", "moz-webgl"];
     let context: WebGLRenderingContext = null;
     for (let i: number = 0; i < names.length; i++) {

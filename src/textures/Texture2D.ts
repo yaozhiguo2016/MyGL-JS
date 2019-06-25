@@ -1,6 +1,5 @@
 import Texture from "./Texture";
 import RenderContext from "../RenderContext";
-import Constant from "../enum/Constant";
 
 /**
  * Created by yaozh on 2017/6/28.
@@ -13,19 +12,8 @@ export default class Texture2D extends Texture {
   protected _width: number;
   protected _height: number;
 
-  protected _flipY: boolean;
-
-  protected _wrapS: number = Constant.REPEAT; // u坐标溢出的渲染模式
-  protected _wrapT: number = Constant.REPEAT; // v坐标溢出的渲染模式
-  protected _magFilter: number = Constant.NEAREST; // 纹理放大和缩小时默认都使用 点采样的方式
-  protected _minFilter: number = Constant.NEAREST;
-
-  protected _useMipMap: boolean = false;
-
   public constructor(pixels?: ArrayBufferView | HTMLImageElement, flipY: boolean = false) {
     super();
-
-    this._pixels = pixels || this.createDefaultTexture();
 
     if (!pixels) {
       this._pixels = this.createDefaultTexture();
@@ -33,8 +21,9 @@ export default class Texture2D extends Texture {
       this._height = Texture2D.DEFAULT_TEXTURE_SIZE;
     } else {
       if (pixels instanceof HTMLImageElement) {
-        this._width = pixels['width'];
-        this._height = pixels['height'];
+        const image = pixels as HTMLImageElement;
+        this._width = image.width;
+        this._height = image.height;
       } else {
         this._width = 0;
         this._height = 0;
@@ -109,45 +98,5 @@ export default class Texture2D extends Texture {
 
   public get height():number {
     return this._height;
-  }
-
-  public set wrapS(value:number) {
-    this._wrapS = value;
-  }
-
-  public get wrapS():number {
-    return this._wrapS;
-  }
-
-  public set wrapT(value:number) {
-    this._wrapT = value;
-  }
-
-  public get wrapT():number {
-    return this._wrapT;
-  }
-
-  public set minFilter(value:number) {
-    this._minFilter = value;
-  }
-
-  public get minFilter():number {
-    return this._minFilter;
-  }
-
-  public set magFilter(value:number) {
-    this._magFilter = value;
-  }
-
-  public get magFilter():number {
-    return this._magFilter;
-  }
-
-  public set useMipMap(value:boolean) {
-    this._useMipMap = value;
-  }
-
-  public get useMipMap():boolean {
-    return this._useMipMap;
   }
 }

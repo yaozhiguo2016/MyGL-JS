@@ -56,6 +56,7 @@ import ShaderUtil from "./utils/ShaderUtil";
 import UniformUtil from "./utils/ShaderHelper";
 import ShaderLib from './utils/ShaderSourceLib';
 import Constant from "./enum/Constant";
+import WebGLRenderer from './core/WebGLRender';
 
 let MyGL = {
   Engine,
@@ -110,7 +111,8 @@ let MyGL = {
   MouseCameraHelper,
   ShaderUtil,
   UniformUtil,
-  ShaderLib
+  ShaderLib,
+  WebGLRenderer
 };
 
 (<any>Object).assign(MyGL, Constant);

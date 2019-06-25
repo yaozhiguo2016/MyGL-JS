@@ -18,20 +18,15 @@ declare class Stats {
 }
 
 export default class Engine {
-  private _scene: Scene3D;
   private _context: WebGLRenderingContext;
   private _loopExecutor: { loopFunc: Function, context: any };
   private stats: Stats;
 
 
-  constructor(antialias?: boolean) {
-    this._context = RenderContext.createConext(antialias);
+  constructor(canvas:HTMLCanvasElement, antialias?: boolean) {
+    this._context = RenderContext.createConext(canvas, antialias);
     console.log(this._context.getContextAttributes());
 
-  }
-
-  public setScene(scene: Scene3D): void {
-    this._scene = scene;
   }
 
   public setRenderLoop(looper: Function, context?: any): void {

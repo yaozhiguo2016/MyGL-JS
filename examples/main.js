@@ -42,7 +42,7 @@ function Main() {
 
 Main.prototype.loadComplete = function (event) {
   console.log(event);
-  this.engine = new MyGL.Engine(true);
+  this.engine = new MyGL.Engine(document.getElementById('glContainer'), true);
   this.engine.setRenderLoop(this.loop, this);
 
   this.scene = new MyGL.Scene3D();
@@ -168,7 +168,8 @@ Main.prototype.loadComplete = function (event) {
   this.drone.scale = new MyGL.Vector3(0.005, 0.005, 0.005);
   this.scene.addMesh(this.drone);
 
-  this.engine.setScene(this.scene);
+  //this.engine.setScene(this.scene);
+  this.render = new MyGL.WebGLRenderer();
   this.engine.start();
 };
 
@@ -196,7 +197,7 @@ Main.prototype.loop = function () {
   this.pointSphere.translate(0.1, MyGL.Vector3.UP);
   this.pointSphere.rotation.z += 0.02;
 
-  this.scene.draw();
+  this.render.render(this.scene);
 };
 
 new Main();

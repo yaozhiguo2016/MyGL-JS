@@ -1,6 +1,5 @@
 import Light from "../lights/Light";
 import Camera from "../cameras/Camera";
-import RenderContext from "../RenderContext";
 import Vector3 from "../math/Vector3";
 import Mesh from "./Mesh";
 /**
@@ -61,33 +60,7 @@ export default class Scene3D
         return this._ambientColor;
     }
 
-    public draw():void
-    {
-        let gl:WebGLRenderingContext = RenderContext.context;
-        gl.viewport(0,0,RenderContext.viewportWidth, RenderContext.viewportHeight);
-        // Set the clear color and enable the depth test
-        gl.clearColor(0.0, 0.0, 0.0, 1.0);
-        gl.enable(gl.DEPTH_TEST);
-        // Clear color and depth buffer
-        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-        // Draw the cube
-        for (let mesh of this._meshes)
-        {
-            if (!mesh.visible)continue;
-            this.setGLState(gl, mesh);
-            mesh.draw();
-        }
-    }
-
-    private setGLState(gl:WebGLRenderingContext, mesh:Mesh):void {
-      if (mesh.surfaceSide == Mesh.SURFACE_SIDE_FRONT) {
-        gl.enable(gl.CULL_FACE);
-        gl.cullFace(gl.BACK);
-      } else if (mesh.surfaceSide == Mesh.SURFACE_SIDE_BACK) {
-        gl.enable(gl.CULL_FACE);
-        gl.cullFace(gl.FRONT);
-      } else {
-        gl.disable(gl.CULL_FACE);
-      }
+    public get meshes():Mesh[] {
+        return this._meshes;
     }
 }

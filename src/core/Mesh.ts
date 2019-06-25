@@ -3,6 +3,7 @@ import Geometry from "../primitives/Geometry";
 import RenderContext from "../RenderContext";
 import Scene3D from "./Scene3D";
 import StandardMaterial from "../materials/StandardMaterial";
+import ShaderObject from "../shaders/ShaderObject";
 
 /**
  * Created by yaozh on 2017/6/14.
@@ -29,6 +30,8 @@ export default class Mesh extends Object3D {
   protected _castShadow: boolean;
   protected _receiveShadow: boolean;
 
+  protected _shader: ShaderObject;
+
   public constructor(geometry: Geometry, material: StandardMaterial) {
     super();
     this.gl = RenderContext.context;
@@ -39,7 +42,7 @@ export default class Mesh extends Object3D {
     this._castShadow = false;
     this._receiveShadow = false;
 
-    this.material.getShader(); // 根据传入的material生成对应的shader
+    //this.material.getShader(); // 根据传入的material生成对应的shader
     this.createMeshBuffers();
 
     this._type = 'Mesh';
@@ -62,13 +65,13 @@ export default class Mesh extends Object3D {
     return this._material;
   }
 
-  /*public get usedProgram(): WebGLProgram {
-    return this._usedProgram;
+  public get shader(): ShaderObject {
+    return this._shader;
   }
 
-  public set usedProgram(value: WebGLProgram) {
-    this._usedProgram = value;
-  }*/
+  public set shader(value: ShaderObject) {
+    this._shader = value;
+  }
 
   public get scene(): Scene3D {
     return this._scene;
@@ -82,14 +85,21 @@ export default class Mesh extends Object3D {
     return this._surfaceSide;
   }
 
-  public draw(): void {
-    let gl: WebGLRenderingContext = RenderContext.context;
-    this.material.shader.setAttributeAndUniforms(this);
-    if (this.geometry.indexDraw) {
-      gl.drawElements(gl.TRIANGLES, this.geometry.indices.length, gl.UNSIGNED_SHORT, 0);
+  public setGLState():void {
+    const gl = this.gl;
+    if (this.surfaceSide == Mesh.SURFACE_SIDE_FRONT) {
+      gl.enable(gl.CULL_FACE);
+      gl.cullFace(gl.BACK);
+    } else if (this.surfaceSide == Mesh.SURFACE_SIDE_BACK) {
+      gl.enable(gl.CULL_FACE);
+      gl.cullFace(gl.FRONT);
     } else {
-      gl.drawArrays(gl.TRIANGLES, 0, this.geometry.vertexNum);
+      gl.disable(gl.CULL_FACE);
     }
+  }
+
+  public clearGLState():void {
+
   }
 
   public createArrayBuffer(bufferData): WebGLBuffer {
@@ -124,6 +134,7 @@ export default class Mesh extends Object3D {
   }
 
   public dispose(): void {
+    this.shader = null;
     this.gl.deleteBuffer(this.vertexBuffer);
     this.gl.deleteBuffer(this.normalBuffer);
     this.gl.deleteBuffer(this.indexBuffer);
