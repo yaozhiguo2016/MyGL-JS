@@ -47,7 +47,6 @@ Main.prototype.loadComplete = function (event) {
 
   this.scene = new MyGL.Scene3D();
   this.scene.ambientColor = new MyGL.Vector3(1.0, 1.0, 1.0);
-  //this.scene.initialize();
 
   //透视摄影机
   this.camera = new MyGL.PerspectiveCamera();
@@ -142,8 +141,7 @@ Main.prototype.loadComplete = function (event) {
     MyGL.AssetsManager.getInstance().getAsset('cloudy_noon_nz')
   ]);
   cubeMate.textureCube = cubeTexture;
-  //var skyBox = new MyGL.SkyBox(80, cubeMate);
-  //skyBox.position = this.camera.position;
+  var skyBox = new MyGL.SkyBox(10, cubeMate);
   //this.scene.addMesh(skyBox);
 
   var img = MyGL.AssetsManager.getInstance().getAsset('land');
@@ -168,7 +166,6 @@ Main.prototype.loadComplete = function (event) {
   this.drone.scale = new MyGL.Vector3(0.005, 0.005, 0.005);
   this.scene.addMesh(this.drone);
 
-  //this.engine.setScene(this.scene);
   this.render = new MyGL.WebGLRenderer();
   this.engine.start();
 };
@@ -201,3 +198,4 @@ Main.prototype.loop = function () {
 };
 
 new Main();
+

@@ -24,10 +24,6 @@ import TextFileLoader from './loaders/TextFileLoader';
 
 import AssetData from './managers/AssetData';
 import AssetsManager from './managers/AssetsManager';
-import CubeMapMaterialResolver from "./materials/materialresolvers/CubeMapMaterialResolver";
-import MaterialResolver from "./materials/materialresolvers/MaterialResolver";
-import ResolverGenerator from "./materials/materialresolvers/ResolverGenerator";
-import StandardMaterialResolver from "./materials/materialresolvers/StandardMaterialResolver";
 import CubeMapMaterial from "./materials/CubeMapMaterial";
 import Material from "./materials/Material";
 import ShaderMaterial from "./materials/ShaderMaterial";
@@ -81,10 +77,6 @@ let MyGL = {
   TextFileLoader,
   AssetData,
   AssetsManager,
-  CubeMapMaterialResolver,
-  MaterialResolver,
-  ResolverGenerator,
-  StandardMaterialResolver,
   CubeMapMaterial,
   Material,
   ShaderMaterial,

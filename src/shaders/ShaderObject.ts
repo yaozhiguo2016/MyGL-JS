@@ -7,6 +7,7 @@ import ShaderUtil from "../utils/ShaderUtil";
 import Mesh from "../core/Mesh";
 import ShaderHelper from "../utils/ShaderHelper";
 import Scene3D from "../core/Scene3D";
+import WebGLRenderer from "../core/WebGLRender";
 
 export default class ShaderObject {
 
@@ -38,7 +39,7 @@ export default class ShaderObject {
 
   }
 
-  public setAttributesAndUniforms(scene: Scene3D, mesh: Mesh):void {
+  public setAttributesAndUniforms(scene: Scene3D, mesh: Mesh, renderer: WebGLRenderer):void {
 
   }
 

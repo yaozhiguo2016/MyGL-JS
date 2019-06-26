@@ -8,6 +8,7 @@ import StandardMaterial from "../materials/StandardMaterial";
 import ShaderManager from "./ShaderManager";
 import StandardShaderObject from "./StandardShaderObject";
 import ShaderSourceLib from "../utils/ShaderSourceLib";
+import SkyBoxShaderObject from "./SkyBoxShaderObject";
 
 export default class ShaderFactory {
   public static getShader(scene: Scene3D, mesh: Mesh): ShaderObject {
@@ -15,11 +16,16 @@ export default class ShaderFactory {
     const geometry: Geometry = mesh.geometry;
     const material: Material = mesh.material;
 
-    if(material instanceof StandardMaterial) {
-      const key: string = `standard_${material.shadingType}`;
+    if (material.type === 'StandardMaterial') {
+      const key: string = `standard_${(material as StandardMaterial).shadingType}`;
       const vertSrc = ShaderSourceLib[`${key}_vert.glsl`];
       const fragSrc = ShaderSourceLib[`${key}_frag.glsl`];
       return  ShaderManager.createShader(key, StandardShaderObject, vertSrc, fragSrc);
+    } else if (material.type === 'CubeMapMaterial') {
+      const key: string = `skybox`;
+      const vertSrc = ShaderSourceLib[`${key}_vert.glsl`];
+      const fragSrc = ShaderSourceLib[`${key}_frag.glsl`];
+      return  ShaderManager.createShader(key, SkyBoxShaderObject, vertSrc, fragSrc);
     }
   }
 }

@@ -42,7 +42,6 @@ export default class Mesh extends Object3D {
     this._castShadow = false;
     this._receiveShadow = false;
 
-    //this.material.getShader(); // 根据传入的material生成对应的shader
     this.createMeshBuffers();
 
     this._type = 'Mesh';
@@ -111,6 +110,7 @@ export default class Mesh extends Object3D {
     // Write the attribute data into the buffer object
     this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffer);
     this.gl.bufferData(this.gl.ARRAY_BUFFER, bufferData, this.gl.STATIC_DRAW);
+    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, null);
     return buffer;
   }
 
@@ -123,6 +123,7 @@ export default class Mesh extends Object3D {
     // Write the indices into the buffer object
     this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
     this.gl.bufferData(this.gl.ELEMENT_ARRAY_BUFFER, this._geometry.indices, this.gl.STATIC_DRAW);
+    this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, null);
     return indexBuffer;
   }
 
@@ -131,6 +132,7 @@ export default class Mesh extends Object3D {
     // Assign the buffer object to the attribute variable
     this.gl.vertexAttribPointer(a_attribute, num, type, false, 0, 0);
     this.gl.enableVertexAttribArray(a_attribute);
+    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, null);
   }
 
   public dispose(): void {

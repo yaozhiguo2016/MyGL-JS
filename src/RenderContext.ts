@@ -36,11 +36,20 @@ export default class RenderContext {
 
   public static createConext(canvas:HTMLCanvasElement, antialias?: boolean): WebGLRenderingContext {
     let names: string[] = ["webgl2", "webgl", "experimental-webgl", "webkit-3d", "moz-webgl"];
+    const param = {
+      alpha: true,
+      antialias: antialias || true,
+      depth: true,
+      failIfMajorPerformanceCaveat: false,
+      premultipliedAlpha: true,
+      preserveDrawingBuffer: false,
+      stencil: false
+    };
     let context: WebGLRenderingContext = null;
     for (let i: number = 0; i < names.length; i++) {
       try {
         let name: string = names[i];
-        context = <WebGLRenderingContext>(canvas.getContext(name, {antialias: (antialias || true)}));
+        context = <WebGLRenderingContext>(canvas.getContext(name, param));
       } catch (e) {
         console.log(e);
       }

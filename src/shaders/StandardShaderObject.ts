@@ -3,16 +3,12 @@ import Mesh from "../core/Mesh";
 import ShaderHelper from "../utils/ShaderHelper";
 import RenderContext from "../RenderContext";
 import Scene3D from "../core/Scene3D";
-import Camera from "../cameras/Camera";
-import Quaternion from "../math/Quaternion";
 import Vector3 from "../math/Vector3";
-import Matrix4 from "../math/Matrix4";
-import Light from "../lights/Light";
-import Vector4 from "../math/Vector4";
 import StandardMaterial from "../materials/StandardMaterial";
 import Geometry from "../primitives/Geometry";
 import PointLight from "../lights/PointLight";
 import SpotLight from "../lights/SpotLight";
+import WebGLRenderer from "../core/WebGLRender";
 
 /**
  * Created by yaozh on 2019/5/27.
@@ -63,85 +59,58 @@ import SpotLight from "../lights/SpotLight";
       }
     }
 
-    public setAttributesAndUniforms(scene: Scene3D, mesh: Mesh):void {
+    public setAttributesAndUniforms(scene: Scene3D, mesh: Mesh, renderer: WebGLRenderer):void {
       ShaderHelper.uniform1i(this.getUniform('side'), mesh.surfaceSide);
       ShaderHelper.uniform1i(this.getUniform('u_NumLight'), mesh.scene.lights.length);
-      this.handleMVP(scene, mesh);
-      this.handleLights(scene, mesh);
+      this.handleMVP(scene, mesh, renderer);
+      this.handleLights(scene, mesh, renderer);
       this.handleMaterials(scene, mesh);
       this.setShaderDataFromMesh(mesh);
     }
 
-    protected handleMVP(scene: Scene3D, mesh:Mesh):void {
-      let camera:Camera = scene.currentCamera;
-  
+    protected handleMVP(scene: Scene3D, mesh:Mesh, renderer: WebGLRenderer):void {
       //Model-View-Projection
       mesh.updateWorldMatrix();
-      camera.updateWorldMatrix();
-      mesh.modelViewMatrix.multiplyMatrices(camera.inverseWorldMatrix, mesh.worldMatrix);
+      mesh.modelViewMatrix.multiplyMatrices(renderer.cameraInverseMatrix, mesh.worldMatrix);
       ShaderHelper.uniformMatrix4fv(this.getUniform('u_mvMatrix'), false, mesh.modelViewMatrix.elements);
-      ShaderHelper.uniformMatrix4fv(this.getUniform('u_ProjMatrix'), false, camera.projMatrix.elements);
+      ShaderHelper.uniformMatrix4fv(this.getUniform('u_ProjMatrix'), false, renderer.currentCamera.projMatrix.elements);
   
-      //法线转换
+      //法线转换,如果是正交变换，则可以通过求转置矩阵直接获取逆矩阵，待优化
       mesh.normalMatrix.getInverse(mesh.worldMatrix, true);
       mesh.normalMatrix.transpose();
-      let q:Quaternion = new Quaternion();
-      camera.inverseWorldMatrix.decompose(new Vector3(), q, new Vector3());
-      let qm:Matrix4 = new Matrix4();
-      mesh.normalMatrix.premultiply(qm.makeRotationFromQuaternion(q));
+      mesh.normalMatrix.premultiply(renderer.viewRotationMatrix);
       ShaderHelper.uniformMatrix4fv(this.getUniform('u_NormalMatrix'), false, mesh.normalMatrix.elements);
     }
   
-    protected handleLights(scene: Scene3D, mesh:Mesh):void {
-      let cameraInverseMatrix:Matrix4 = scene.currentCamera.inverseWorldMatrix;
-  
+    protected handleLights(scene: Scene3D, mesh:Mesh, renderer: WebGLRenderer):void {
       let numLights:number = scene.lights.length;
-      numLights = numLights <= StandardShaderObject.MAX_NUM_LIGHTS ? numLights : StandardShaderObject.MAX_NUM_LIGHTS; // 保证最多只有8个光源起作用
-  
+      numLights = Math.min(numLights, StandardShaderObject.MAX_NUM_LIGHTS);
       for (let i:number = 0; i < numLights; i++) {
-        let light:Light = scene.lights[i];
-        if (!light.enabled) continue; // 关闭的光源无需渲染
-        light.updateWorldMatrix();
-  
-        let pos:Vector3 = light.getWorldPosition();
-        let np:Vector3 = new Vector3();
-        let lightPos:Vector4;
-  
+        const lightObj = renderer.lightObjects[i];//scene.lights[i];
+        const { light, lightPos, dir } = lightObj;
         //对于平行光源（只有方向）而言，只考虑其从世界坐标系到视角坐标系变换的旋转分量，平移和缩放不予考虑
         switch (light.type) {
-          case 'DirectionalLight': {
-            let rm:Matrix4 = (new Matrix4()).extractRotation(cameraInverseMatrix);
-            np.copyFrom(pos).applyMatrix4(rm);
-            lightPos = new Vector4(np.x, np.y, np.z, 0.0);
-            break;
-          }
           case 'PointLight': {
-            let lit = light as PointLight;
-            np.copyFrom(pos).applyMatrix4(cameraInverseMatrix);
-            lightPos = new Vector4(np.x, np.y, np.z, 1.0);
-            ShaderHelper.uniform1f(this.getUniform('lightProperties[' + i + '].scope'), lit.scope);
-            ShaderHelper.uniform1f(this.getUniform('lightProperties[' + i + '].attenuate'), lit.attenuate);
+            const lit = light as PointLight;
+            ShaderHelper.uniform1f(this.getUniform('lights[' + i + '].scope'), lit.scope);
+            ShaderHelper.uniform1f(this.getUniform('lights[' + i + '].attenuate'), lit.attenuate);
             break;
           }
           case 'SpotLight': {
-            let lit = light as SpotLight;
-            np.copyFrom(pos).applyMatrix4(cameraInverseMatrix);
-            let dir = lit.direction.clone();
-            dir.applyMatrix4(cameraInverseMatrix);
-            lightPos = new Vector4(np.x, np.y, np.z, 1.0);
-            ShaderHelper.uniform1f(this.getUniform('lightProperties[' + i + '].scope'), lit.scope);
-            ShaderHelper.uniform1f(this.getUniform('lightProperties[' + i + '].attenuate'), lit.attenuate);
-            ShaderHelper.uniform1f(this.getUniform('lightProperties[' + i + '].theta'), lit.theta);
-            ShaderHelper.uniform3f(this.getUniform('lightProperties[' + i + '].direction'), dir.x, dir.y, dir.z);
+            const lit = light as SpotLight;
+            ShaderHelper.uniform1f(this.getUniform('lights[' + i + '].scope'), lit.scope);
+            ShaderHelper.uniform1f(this.getUniform('lights[' + i + '].attenuate'), lit.attenuate);
+            ShaderHelper.uniform1f(this.getUniform('lights[' + i + '].theta'), lit.theta);
+            ShaderHelper.uniform3f(this.getUniform('lights[' + i + '].direction'), dir.x, dir.y, dir.z);
             break;
           }
         }
   
-        ShaderHelper.uniform4fv(this.getUniform('lightProperties[' + i + '].position'), lightPos.elements);
+        ShaderHelper.uniform4fv(this.getUniform('lights[' + i + '].position'), lightPos.elements);
         let lightColor:Vector3 = light.color;
-        ShaderHelper.uniform3f(this.getUniform('lightProperties[' + i + '].color'), lightColor.x, lightColor.y, lightColor.z);
+        ShaderHelper.uniform3f(this.getUniform('lights[' + i + '].color'), lightColor.x, lightColor.y, lightColor.z);
         let lightIntensity:number = light.intensity;
-        ShaderHelper.uniform1f(this.getUniform('lightProperties[' + i + '].intensity'), lightIntensity);
+        ShaderHelper.uniform1f(this.getUniform('lights[' + i + '].intensity'), lightIntensity);
       }
     }
   

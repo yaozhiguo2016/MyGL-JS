@@ -11,18 +11,17 @@ export default class AssetsManager extends EventDispatcher
     public static LOAD_COMPLETE:string = "loadComplete";
     public static GROUP_LOAD_COMPLETE:string = "groupLoadComplete";
 
+    private assetsData:Array<AssetData> = [];
+    private _isLoading:boolean = false;
+
     private static _instance:AssetsManager;
 
-    public static getInstance():AssetsManager
-    {
-        if (!this._instance){
+    public static getInstance():AssetsManager {
+        if (this._instance == null) {
             this._instance = new AssetsManager();
         }
         return this._instance;
     }
-
-    private assetsData:Array<AssetData> = [];
-    private _isLoading:boolean = false;
 
     private assets:Object = {};
 
